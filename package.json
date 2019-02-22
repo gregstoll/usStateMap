@@ -1,0 +1,16 @@
+{
+  "name": "us-state-map",
+  "version": "1.0.0",
+  "description": "React component for displaying colors on a US state map",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gregstoll/usStateMap.git"
+  },
+  "author": "Greg Stoll <greg@gregstoll.com>  (https://gregstoll.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gregstoll/usStateMap/issues"
+  },
+  "homepage": "https://github.com/gregstoll/usStateMap#readme"
+}
