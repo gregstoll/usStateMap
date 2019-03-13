@@ -1,6 +1,8 @@
 import React from 'react';
 import { render } from "react-dom";
 import { TextInput } from "./lib";
+import { StateMap } from './lib/StateMap';
+i
 
 const App = () => (
   <div style={{ width: 640, margin: "15px auto" }}>
