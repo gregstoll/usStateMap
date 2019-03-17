@@ -6,29 +6,56 @@ import 'rc-slider/assets/index.css';
 import { isUndefined } from 'util';
 
 export interface MapDateSliderProps {
-    // Exactly one of this and yearsPerTick should be defined (the other should be undefined)
+    /** 
+     *  The number of ticks per year, if a year is made up of multiple ticks.  If this
+     *  is defined it should be divisible by 12 (i.e. 1, 2, 3, 4, 6, or 12)
+     *  Exactly one of this and yearsPerTick should be defined (the other should be undefined) */
     ticksPerYear: number,
-    // Exactly one of this and ticksPerYear should be defined (the other should be undefined)
+    /** 
+     *  The number of years per tick, if a tick covers multiple years.
+     *  Exactly one of this and ticksPerYear should be defined (the other should be undefined) */
     yearsPerTick: number,
-    startDate: MapDate,
-    endDate: MapDate,
-    currentDate: MapDate,
-    onDateChange: (MapDate) => void
+    /**
+     *  The TickDateRange of the first tick of the slider.
+     * */
+    startTickDateRange: TickDateRange,
+    /**
+     *  The TickDateRange of the last tick of the slider.
+     * */
+    endTickDateRange: TickDateRange,
+    /**
+     *  The TickDateRange of the current tick.
+     * */
+    currentTickDateRange: TickDateRange,
+    /**
+     *  Callback called when the tick changes (whether the user changes it or
+     *  it automatically advances because it's playing)
+     * */
+    onTickDateRangeChange: (tickDateRange: TickDateRange) => void
 }
 
-export class MapDate {
-    public readonly year: number;
-    // 0 indexed
+/** Represents a date range of a tick on the slider.
+ * The year and month represent the end of the range, while the 
+ * beginning of the range can be calculated by looking at
+ * ticksPerYear or yearsPerTick, although I expect most applications
+ * will set these to be constants so your code can assume what they are. */
+export class TickDateRange {
+    /** The ending year that this date range represents. */
+    public readonly endYear: number;
+    /**
+     * The ending month that this date range represents.
+     * Note that this is 0-indexed, so 0=January and 11=December.
+     */
     public readonly endMonth: number
-    constructor(year: number, endMonth: number) {
-        this.year = year;
+    constructor(endYear: number, endMonth: number) {
+        this.endYear = endYear;
         if (endMonth < 0 || endMonth > 11) {
             throw `endMonth is out of range (must be >= 0 and < 12, got ${endMonth})`;
         }
         this.endMonth = endMonth;
     }
-    equals(other: MapDate): boolean {
-        return this.year == other.year && this.endMonth == other.endMonth;
+    equals(other: TickDateRange): boolean {
+        return this.endYear == other.endYear && this.endMonth == other.endMonth;
     }
 }
 
@@ -55,18 +82,18 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
             return 12 / this.props.ticksPerYear;
         }
     }
-    sliderIndexToMapDate(sliderIndex: number): MapDate {
-        let newMonth = this.props.startDate.endMonth + this.monthChangePerTick() * sliderIndex;
-        return new MapDate(this.props.startDate.year + Math.floor(newMonth / 12), newMonth % 12);
+    sliderIndexToMapDate(sliderIndex: number): TickDateRange {
+        let newMonth = this.props.startTickDateRange.endMonth + this.monthChangePerTick() * sliderIndex;
+        return new TickDateRange(this.props.startTickDateRange.endYear + Math.floor(newMonth / 12), newMonth % 12);
     }
-    mapDateToSliderIndex(mapDate: MapDate): number {
-        let yearDifference = mapDate.year - this.props.startDate.year;
-        let monthDifference = mapDate.endMonth - this.props.startDate.endMonth;
+    mapDateToSliderIndex(mapDate: TickDateRange): number {
+        let yearDifference = mapDate.endYear - this.props.startTickDateRange.endYear;
+        let monthDifference = mapDate.endMonth - this.props.startTickDateRange.endMonth;
         let totalMonthDifference = 12 * yearDifference + monthDifference;
         return totalMonthDifference / this.monthChangePerTick();
     }
     onSliderChange = (value: number) => {
-        this.props.onDateChange(this.sliderIndexToMapDate(value));
+        this.props.onTickDateRangeChange(this.sliderIndexToMapDate(value));
     }
     advanceDate = () => {
         if (!this.state.isPlaying) {
@@ -78,16 +105,16 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
             return;
         }
         // advance date
-        let currentSliderIndex = this.mapDateToSliderIndex(this.props.currentDate);
+        let currentSliderIndex = this.mapDateToSliderIndex(this.props.currentTickDateRange);
         let newDate = this.sliderIndexToMapDate(currentSliderIndex + 1);
-        this.props.onDateChange(newDate);
+        this.props.onTickDateRangeChange(newDate);
         this.callAdvanceDateInFuture();
     }
     callAdvanceDateInFuture = () => {
         setTimeout(this.advanceDate, this.state.playSpeed);
     }
     sliderAtEnd(): boolean {
-        return this.props.currentDate.equals(this.props.endDate);
+        return this.props.currentTickDateRange.equals(this.props.endTickDateRange);
     }
     clickStopPlayButton = () => {
         if (this.state.isPlaying) {
@@ -95,7 +122,7 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
         } else {
             this.setState({ isPlaying: true });
             if (this.sliderAtEnd()) {
-                this.props.onDateChange(this.props.startDate);
+                this.props.onTickDateRangeChange(this.props.startTickDateRange);
             }
             this.callAdvanceDateInFuture();
         }
@@ -117,7 +144,7 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
         // https://react-component.github.io/slider/examples/slider.html
         return (
             <div style={{ width: 500 }} className="centerFixedWidth">
-                <Slider min={0} max={this.mapDateToSliderIndex(this.props.endDate)} step={1} value={this.mapDateToSliderIndex(this.props.currentDate)} onChange={this.onSliderChange} />
+                <Slider min={0} max={this.mapDateToSliderIndex(this.props.endTickDateRange)} step={1} value={this.mapDateToSliderIndex(this.props.currentTickDateRange)} onChange={this.onSliderChange} />
                 <div>
                     <Button onClick={() => this.clickStopPlayButton()}>{this.state.isPlaying ? "Stop" : "Play"}</Button>
                     Speed: <Select options={MapDateSlider.speedOptions()} value={this.state.playSpeed} onChange={this.changeSpeed} />

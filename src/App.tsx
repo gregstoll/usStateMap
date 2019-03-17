@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StateMap, MapDateSlider, MapDate } from './lib';
+import { StateMap, MapDateSlider, TickDateRange } from './lib';
 import 'rc-slider/assets/index.css';
 import 'semantic-ui-css/semantic.min.css';
 
@@ -57,8 +57,8 @@ export class App extends Component<{}, AppState> {
         return error;
     }
 
-    onSliderDateChange = (date: MapDate) => {
-        this.setState({ year: date.year });
+    onSliderDateChange = (date: TickDateRange) => {
+        this.setState({ year: date.endYear });
     }
 
     render = () => {
@@ -80,10 +80,10 @@ export class App extends Component<{}, AppState> {
               <MapDateSlider
                   yearsPerTick={1}
                   ticksPerYear={undefined}
-                  startDate={new MapDate(MIN_YEAR, 11)}
-                  endDate={new MapDate(MAX_YEAR, 11)}
-                  currentDate={new MapDate(this.state.year, 11)}
-                  onDateChange={this.onSliderDateChange} />
+                  startTickDateRange={new TickDateRange(MIN_YEAR, 11)}
+                  endTickDateRange={new TickDateRange(MAX_YEAR, 11)}
+                  currentTickDateRange={new TickDateRange(this.state.year, 11)}
+                  onTickDateRangeChange={this.onSliderDateChange} />
         </div>
     }
 }
