@@ -6,7 +6,8 @@ import parseColor from 'parse-color';
 
 interface AppState {
     year: number,
-    fakeStateColors: Map<number, Map<string, string>>
+    fakeStateColors: Map<number, Map<string, string>>,
+    stateSelected: string
 }
 
 const MIN_YEAR = 2010;
@@ -15,13 +16,16 @@ const MAX_YEAR = 2019;
 export class App extends Component<{}, AppState> {
     state: AppState = {
         year: MAX_YEAR,
-        fakeStateColors: undefined
+        fakeStateColors: undefined,
+        stateSelected: undefined
     }
 
     onStateSelected = (stateCode: string) => {
+        this.setState({ stateSelected: stateCode });
     }
 
     onStateCleared = () => {
+        this.setState({ stateSelected: undefined });
     }
 
     onMapError = (error) => {
@@ -67,6 +71,7 @@ export class App extends Component<{}, AppState> {
         if (this.state.fakeStateColors === undefined) {
             return <div>Loading</div>;
         }
+        let stateSelectedDiv = <div>{this.state.stateSelected}</div>;
         return <div style={{ width: 640, margin: "15px auto" }}>
             <StateMap isCartogram={true}
                 stateColors={this.state.fakeStateColors.get(this.state.year)}
@@ -78,8 +83,9 @@ export class App extends Component<{}, AppState> {
                 width={900}
                 height={500}
                 onError={this.onMapError} />
-              <div>Year: {this.state.year}</div>
-              <MapDateSlider
+            <div>Year: {this.state.year}</div>
+            <div>State selected: {this.state.stateSelected || "None"}</div>
+            <MapDateSlider
                 yearsPerTick={1}
                 startTickDateRange={new TickDateRange(MIN_YEAR, 11)}
                 endTickDateRange={new TickDateRange(MAX_YEAR, 11)}
