@@ -79,6 +79,9 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
         this.state = { isPlaying: false, playSpeed: MapDateSlider.speedOptions()[2].value };
     }
 
+    /**
+     * How many months the date advances per tick.
+     * */
     monthChangePerTick() {
         if (isUndefined(this.props.ticksPerYear)) {
             return this.props.yearsPerTick * 12;
