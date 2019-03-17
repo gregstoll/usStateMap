@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { StateMap, MapDateSlider, MapDate } from './lib';
 import 'rc-slider/assets/index.css';
 import 'semantic-ui-css/semantic.min.css';
-import { number } from 'prop-types';
 
 interface AppState {
     year: number,
-    fakeData: Map<number, Map<string, string>>
+    fakeStateColors: Map<number, Map<string, string>>
 }
 
 const MIN_YEAR = 2010;
@@ -15,7 +14,7 @@ const MAX_YEAR = 2019;
 export class App extends Component<{}, AppState> {
     state: AppState = {
         year: MAX_YEAR,
-        fakeData: undefined
+        fakeStateColors: undefined
     }
 
     onStateSelected = (stateCode: string) => {
@@ -37,7 +36,7 @@ export class App extends Component<{}, AppState> {
 
     componentDidMount = () => {
         // You probably want to load some data here, we'll just make something up.
-        let tempFakeData = new Map<number, Map<string, string>>();
+        let tempFakeStateColors = new Map<number, Map<string, string>>();
         const stateCodes: Array<string> = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'];
         for (let year = MIN_YEAR; year <= MAX_YEAR; ++year) {
             let data = new Map<string, string>();
@@ -45,9 +44,9 @@ export class App extends Component<{}, AppState> {
                 data.set(stateCode, this.randomColor());
             }
 
-            tempFakeData.set(year, data);
+            tempFakeStateColors.set(year, data);
         }
-        this.setState({ fakeData: tempFakeData });
+        this.setState({ fakeStateColors: tempFakeStateColors });
     }
 
     _errorStringFromError = (error: any) => {
@@ -63,12 +62,12 @@ export class App extends Component<{}, AppState> {
     }
 
     render = () => {
-        if (this.state.fakeData === undefined) {
+        if (this.state.fakeStateColors === undefined) {
             return <div>Loading</div>;
         }
         return <div style={{ width: 640, margin: "15px auto" }}>
             <StateMap isCartogram={true}
-                stateColors={this.state.fakeData.get(this.state.year)}
+                stateColors={this.state.fakeStateColors.get(this.state.year)}
                 stateTitles={new Map<string, string>()}
                 stateSelectedCallback={this.onStateSelected}
                 stateClearedCallback={this.onStateCleared}
