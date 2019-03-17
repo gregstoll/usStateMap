@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { StateMap, MapDateSlider, TickDateRange } from './lib';
 import 'rc-slider/assets/index.css';
 import 'semantic-ui-css/semantic.min.css';
+import parseColor from 'parse-color';
 
 interface AppState {
     year: number,
@@ -28,10 +29,11 @@ export class App extends Component<{}, AppState> {
     }
 
     randomColor = () => {
-        if (Math.random() * 2 < 1) {
-            return 'red';
-        }
-        return 'blue';
+        // Just use some nice red/blue colors
+        const _colors =
+            ['#67001f', '#b2182b', '#d6604d', '#f4a582', '#fddbc7', '#f7f7f7', '#d1e5f0', '#92c5de', '#4393c3', '#2166ac', '#053061'];
+        let idx = Math.floor(Math.random() * _colors.length);
+        return _colors[idx];
     };
 
     componentDidMount = () => {
@@ -79,7 +81,6 @@ export class App extends Component<{}, AppState> {
               <div>Year: {this.state.year}</div>
               <MapDateSlider
                 yearsPerTick={1}
-                ticksPerYear={undefined}
                 startTickDateRange={new TickDateRange(MIN_YEAR, 11)}
                 endTickDateRange={new TickDateRange(MAX_YEAR, 11)}
                 currentTickDateRange={new TickDateRange(this.state.year, 11)}

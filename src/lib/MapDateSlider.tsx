@@ -10,33 +10,28 @@ export interface MapDateSliderProps {
      *  The number of ticks per year, if a year is made up of multiple ticks.  If this
      *  is defined it should be divisible by 12 (i.e. 1, 2, 3, 4, 6, or 12)
      *  Exactly one of this and yearsPerTick should be defined (the other should be undefined) */
-    ticksPerYear: number,
+    ticksPerYear?: number,
     /** 
      *  The number of years per tick, if a tick covers multiple years.
      *  Exactly one of this and ticksPerYear should be defined (the other should be undefined) */
-    yearsPerTick: number,
+    yearsPerTick?: number,
     /**
-     *  The TickDateRange of the first tick of the slider.
-     * */
+     *  The TickDateRange of the first tick of the slider. */
     startTickDateRange: TickDateRange,
     /**
-     *  The TickDateRange of the last tick of the slider.
-     * */
+     *  The TickDateRange of the last tick of the slider. */
     endTickDateRange: TickDateRange,
     /**
-     *  The TickDateRange of the current tick.
-     * */
+     *  The TickDateRange of the current tick. */
     currentTickDateRange: TickDateRange,
     /**
      *  Callback called when the tick changes (whether the user changes it or
-     *  it automatically advances because it's playing)
-     * */
+     *  it automatically advances because it's playing) */
     onTickDateRangeChange: (tickDateRange: TickDateRange) => void,
     /**
      * Whether to hide the Play/Stop button and speed controls.  Default
-     * is to show them.
-     */
-    hidePlay: boolean
+     * is to show them. */
+    hidePlay?: boolean
 }
 
 /** Represents a date range of a tick on the slider.

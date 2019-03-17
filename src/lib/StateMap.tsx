@@ -10,15 +10,34 @@ import parseColor from 'parse-color';
 import './StateMap.css';
 
 interface StateMapProps {
+    /**
+     * Map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to what color it should be.
+     * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
+     * */
     stateColors: Map<string, string>,
-    stateTitles: Map<string, string>,
-    stateSelectedCallback: (stateCode: string) => void,
-    stateClearedCallback: () => void,
+    /**
+     * Optional map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to the label on the tooltip.
+     * */
+    stateTitles?: Map<string, string>,
+    /**
+     * Optional callback when a state is tapped.  Argument passed is the stateCode (i.e. 'AL', 'DC', 'TX', etc.)
+     * */
+    stateSelectedCallback?: (stateCode: string) => void,
+    /**
+     * Optional callback when a part of the map that is not a state is tapped.
+     * */
+    stateClearedCallback?: () => void,
+    /**
+     * Whether the map is a cartogram (state sizes roughly proportional to population) or not.
+     * */
     isCartogram: boolean,
     x: number,
     y: number,
     width: number,
     height: number,
+    /**
+     * Callback that is called when there's an error loading data.
+     * */
     onError: (error: any) => void
 };
 
@@ -143,7 +162,9 @@ export class StateMap extends Component<StateMapProps, StateMapState>{
 
     stateClick = (event: React.MouseEvent<SVGElement>) => {
         let stateCode: string = event.currentTarget.attributes["name"].value;
-        this.props.stateSelectedCallback(stateCode);
+        if (this.props.stateSelectedCallback) {
+            this.props.stateSelectedCallback(stateCode);
+        }
     };
 
     rootClick = (event: React.MouseEvent<SVGGElement>) => {
@@ -159,7 +180,9 @@ export class StateMap extends Component<StateMapProps, StateMapState>{
         // thing doesn't have a name
         if (isNullOrUndefined(nameAttribute))
         {
-            this.props.stateClearedCallback();
+            if (this.props.stateClearedCallback) {
+                this.props.stateClearedCallback();
+            }
         }
     }
 
@@ -202,12 +225,13 @@ export class StateMap extends Component<StateMapProps, StateMapState>{
 
     getLabelColor(backgroundColor: string): string {
         let backgroundParsedColor = parseColor(backgroundColor);
-        let hsl: number[] = backgroundParsedColor.hsl;
-        if (isNullOrUndefined(hsl)) {
+        // Used to use HSL, but I think this is more accurate
+        let rgb: number[] = backgroundParsedColor.rgb;
+        if (isNullOrUndefined(rgb)) {
             return "#222";
         }
-        let l: number = hsl[2];
-        if (l > 40) {
+        let grayscale = 0.2989 * rgb[0] + 0.5870 * rgb[1] + 0.1140 * rgb[2];
+        if (grayscale > 0.5 * 255) {
             return "#222";
         } else {
             return "#ddd";
