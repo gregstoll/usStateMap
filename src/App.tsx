@@ -78,12 +78,13 @@ export class App extends Component<{}, AppState> {
                 onError={this.onMapError} />
               <div>Year: {this.state.year}</div>
               <MapDateSlider
-                  yearsPerTick={1}
-                  ticksPerYear={undefined}
-                  startTickDateRange={new TickDateRange(MIN_YEAR, 11)}
-                  endTickDateRange={new TickDateRange(MAX_YEAR, 11)}
-                  currentTickDateRange={new TickDateRange(this.state.year, 11)}
-                  onTickDateRangeChange={this.onSliderDateChange} />
+                yearsPerTick={1}
+                ticksPerYear={undefined}
+                startTickDateRange={new TickDateRange(MIN_YEAR, 11)}
+                endTickDateRange={new TickDateRange(MAX_YEAR, 11)}
+                currentTickDateRange={new TickDateRange(this.state.year, 11)}
+                onTickDateRangeChange={this.onSliderDateChange}
+              />
         </div>
     }
 }

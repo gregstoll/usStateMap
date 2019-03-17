@@ -31,7 +31,12 @@ export interface MapDateSliderProps {
      *  Callback called when the tick changes (whether the user changes it or
      *  it automatically advances because it's playing)
      * */
-    onTickDateRangeChange: (tickDateRange: TickDateRange) => void
+    onTickDateRangeChange: (tickDateRange: TickDateRange) => void,
+    /**
+     * Whether to hide the Play/Stop button and speed controls.  Default
+     * is to show them.
+     */
+    hidePlay: boolean
 }
 
 /** Represents a date range of a tick on the slider.
@@ -141,14 +146,16 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
     }
 
     render() {
+        let playStopButton =
+            <div>
+                <Button onClick={() => this.clickStopPlayButton()}>{this.state.isPlaying ? "Stop" : "Play"}</Button>
+                Speed: <Select options={MapDateSlider.speedOptions()} value={this.state.playSpeed} onChange={this.changeSpeed} />
+            </div>;
         // https://react-component.github.io/slider/examples/slider.html
         return (
             <div style={{ width: 500 }} className="centerFixedWidth">
                 <Slider min={0} max={this.mapDateToSliderIndex(this.props.endTickDateRange)} step={1} value={this.mapDateToSliderIndex(this.props.currentTickDateRange)} onChange={this.onSliderChange} />
-                <div>
-                    <Button onClick={() => this.clickStopPlayButton()}>{this.state.isPlaying ? "Stop" : "Play"}</Button>
-                    Speed: <Select options={MapDateSlider.speedOptions()} value={this.state.playSpeed} onChange={this.changeSpeed} />
-                </div>
+                {!this.props.hidePlay && playStopButton}
             </div>
         );
     }
