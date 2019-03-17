@@ -71,7 +71,6 @@ export class App extends Component<{}, AppState> {
         if (this.state.fakeStateColors === undefined) {
             return <div>Loading</div>;
         }
-        let stateSelectedDiv = <div>{this.state.stateSelected}</div>;
         return <div style={{ width: 640, margin: "15px auto" }}>
             <StateMap isCartogram={true}
                 stateColors={this.state.fakeStateColors.get(this.state.year)}
