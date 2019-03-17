@@ -38,9 +38,12 @@ export class App extends Component<{}, AppState> {
     componentDidMount = () => {
         // You probably want to load some data here, we'll just make something up.
         let tempFakeData = new Map<number, Map<string, string>>();
+        const stateCodes: Array<string> = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'];
         for (let year = MIN_YEAR; year <= MAX_YEAR; ++year) {
             let data = new Map<string, string>();
-            data.set('TX', this.randomColor());
+            for (let stateCode of stateCodes) {
+                data.set(stateCode, this.randomColor());
+            }
 
             tempFakeData.set(year, data);
         }
