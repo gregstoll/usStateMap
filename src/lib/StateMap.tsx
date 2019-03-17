@@ -288,7 +288,7 @@ export class StateMap extends Component<StateMapProps, StateMapState>{
         }
         else {
             let that = this;
-            let svgPaths = this.state.drawingInfo.cartogram.selectAll("path").each(function () {
+            this.state.drawingInfo.cartogram.selectAll("path").each(function () {
                 let thisPath = this as SVGPathElement;
                 let stateCode = thisPath.getAttribute("id");
                 let stateNameObj = that.state.drawingInfo.stateInfos.codeToStateName.get(stateCode);
