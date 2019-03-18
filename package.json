@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "public/data"
   ],
   "repository": {
     "type": "git",
@@ -22,11 +23,12 @@
     "build-examples": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "build": "rimraf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__"
+    "build": "rimraf dist && cross-env NODE_ENV=production babel src/lib --out-dir dist --copy-files --ignore __tests__,spec.js,test.js,__snapshots__"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^7.0.1",
+    "cross-env": "^5.2.0",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-scripts": "^2.1.8",
