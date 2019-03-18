@@ -5,7 +5,7 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { isUndefined } from 'util';
 
-export interface MapDateSliderProps {
+export interface DateSliderProps {
     /** 
      *  The number of ticks per year, if a year is made up of multiple ticks.  If this
      *  is defined it should be divisible by 12 (i.e. 1, 2, 3, 4, 6, or 12)
@@ -59,19 +59,19 @@ export class TickDateRange {
     }
 }
 
-interface MapDateSliderState {
+interface DateSliderState {
     isPlaying: boolean,
     playSpeed: number
 }
 
-export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderState> {
+export class DateSlider extends Component<DateSliderProps, DateSliderState> {
     constructor(props) {
         super(props);
         if ((this.props.ticksPerYear === undefined) == (this.props.yearsPerTick === undefined)) {
-            console.error("Exactly one of MapDateSlider's ticksPerYear and yearsPerTick should be defined!");
-            throw "Exactly one of MapDateSlider's ticksPerYear and yearsPerTick should be defined!";
+            console.error("Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!");
+            throw "Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!";
         }
-        this.state = { isPlaying: false, playSpeed: MapDateSlider.speedOptions()[2].value };
+        this.state = { isPlaying: false, playSpeed: DateSlider.speedOptions()[2].value };
     }
 
     /**
@@ -85,18 +85,18 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
             return 12 / this.props.ticksPerYear;
         }
     }
-    sliderIndexToMapDate(sliderIndex: number): TickDateRange {
+    sliderIndexToDateRange(sliderIndex: number): TickDateRange {
         let newMonth = this.props.startTickDateRange.endMonth + this.monthChangePerTick() * sliderIndex;
         return new TickDateRange(this.props.startTickDateRange.endYear + Math.floor(newMonth / 12), newMonth % 12);
     }
-    mapDateToSliderIndex(mapDate: TickDateRange): number {
-        let yearDifference = mapDate.endYear - this.props.startTickDateRange.endYear;
-        let monthDifference = mapDate.endMonth - this.props.startTickDateRange.endMonth;
+    dateRangeToSliderIndex(dateRange: TickDateRange): number {
+        let yearDifference = dateRange.endYear - this.props.startTickDateRange.endYear;
+        let monthDifference = dateRange.endMonth - this.props.startTickDateRange.endMonth;
         let totalMonthDifference = 12 * yearDifference + monthDifference;
         return totalMonthDifference / this.monthChangePerTick();
     }
     onSliderChange = (value: number) => {
-        this.props.onTickDateRangeChange(this.sliderIndexToMapDate(value));
+        this.props.onTickDateRangeChange(this.sliderIndexToDateRange(value));
     }
     advanceDate = () => {
         if (!this.state.isPlaying) {
@@ -108,8 +108,8 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
             return;
         }
         // advance date
-        let currentSliderIndex = this.mapDateToSliderIndex(this.props.currentTickDateRange);
-        let newDate = this.sliderIndexToMapDate(currentSliderIndex + 1);
+        let currentSliderIndex = this.dateRangeToSliderIndex(this.props.currentTickDateRange);
+        let newDate = this.sliderIndexToDateRange(currentSliderIndex + 1);
         this.props.onTickDateRangeChange(newDate);
         this.callAdvanceDateInFuture();
     }
@@ -147,12 +147,12 @@ export class MapDateSlider extends Component<MapDateSliderProps, MapDateSliderSt
         let playStopButton =
             <div>
                 <Button onClick={() => this.clickStopPlayButton()}>{this.state.isPlaying ? "Stop" : "Play"}</Button>
-                Speed: <Select options={MapDateSlider.speedOptions()} value={this.state.playSpeed} onChange={this.changeSpeed} />
+                Speed: <Select options={DateSlider.speedOptions()} value={this.state.playSpeed} onChange={this.changeSpeed} />
             </div>;
         // https://react-component.github.io/slider/examples/slider.html
         return (
             <div style={{ width: 500 }} className="centerFixedWidth">
-                <Slider min={0} max={this.mapDateToSliderIndex(this.props.endTickDateRange)} step={1} value={this.mapDateToSliderIndex(this.props.currentTickDateRange)} onChange={this.onSliderChange} />
+                <Slider min={0} max={this.dateRangeToSliderIndex(this.props.endTickDateRange)} step={1} value={this.dateRangeToSliderIndex(this.props.currentTickDateRange)} onChange={this.onSliderChange} />
                 {!this.props.hidePlay && playStopButton}
             </div>
         );

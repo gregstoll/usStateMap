@@ -1,3 +1,3 @@
 import { StateMap } from "./StateMap";
-import { MapDateSlider, TickDateRange } from "./MapDateSlider";
-export { StateMap, MapDateSlider, TickDateRange };
+import { DateSlider, TickDateRange } from "./MapDateSlider";
+export { StateMap, DateSlider, TickDateRange };

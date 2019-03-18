@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StateMap, MapDateSlider, TickDateRange } from './lib';
+import { StateMap, DateSlider, TickDateRange } from './lib';
 import 'rc-slider/assets/index.css';
 import 'semantic-ui-css/semantic.min.css';
 import parseColor from 'parse-color';
@@ -84,7 +84,7 @@ export class App extends Component<{}, AppState> {
                 onError={this.onMapError} />
             <div>Year: {this.state.year}</div>
             <div>State selected: {this.state.stateSelected || "None"}</div>
-            <MapDateSlider
+            <DateSlider
                 yearsPerTick={1}
                 startTickDateRange={new TickDateRange(MIN_YEAR, 11)}
                 endTickDateRange={new TickDateRange(MAX_YEAR, 11)}
