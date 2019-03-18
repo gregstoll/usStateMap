@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { StateMap, DateSlider, TickDateRange } from './lib';
+import { Button } from 'semantic-ui-react';
 import 'rc-slider/assets/index.css';
 import 'semantic-ui-css/semantic.min.css';
-import parseColor from 'parse-color';
 
 interface AppState {
     year: number,
-    fakeStateColors: Map<number, Map<string, string>>,
-    stateSelected: string
+    stateSelected: string,
+    isCartogram: boolean,
+    fakeStateColors: Map<number, Map<string, string>>
 }
 
 const MIN_YEAR = 2010;
@@ -16,8 +17,9 @@ const MAX_YEAR = 2019;
 export class App extends Component<{}, AppState> {
     state: AppState = {
         year: MAX_YEAR,
-        fakeStateColors: undefined,
-        stateSelected: undefined
+        stateSelected: undefined,
+        isCartogram: true,
+        fakeStateColors: undefined
     }
 
     onStateSelected = (stateCode: string) => {
@@ -69,7 +71,7 @@ export class App extends Component<{}, AppState> {
             return <div>Loading</div>;
         }
         return <div style={{ width: 640, margin: "15px auto" }}>
-            <StateMap isCartogram={true}
+            <StateMap isCartogram={this.state.isCartogram}
                 stateColors={this.state.fakeStateColors.get(this.state.year)}
                 stateTitles={new Map<string, string>()}
                 stateSelectedCallback={this.onStateSelected}
@@ -79,6 +81,13 @@ export class App extends Component<{}, AppState> {
                 width={900}
                 height={500}
                 onError={this.onMapError} />
+            <div style={{ marginTop: "5px" }}>
+                <Button.Group>
+                    <Button active={!this.state.isCartogram} onClick={() => this.setState({ isCartogram: false })}>Normal</Button>
+                    <Button.Or />
+                    <Button active={this.state.isCartogram} onClick={() => this.setState({ isCartogram: true })}>Cartogram</Button>
+                </Button.Group>
+            </div>
             <div>Year: {this.state.year}</div>
             <div>State selected: {this.state.stateSelected || "None"}</div>
             <DateSlider
