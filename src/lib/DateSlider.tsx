@@ -160,7 +160,12 @@ export class DateSlider extends Component<DateSliderProps, DateSliderState> {
         // https://react-component.github.io/slider/examples/slider.html
         return (
             <div style={{ width: 500 }} className="centerFixedWidth">
-                <Slider min={0} max={this.dateRangeToSliderIndex(this.props.endTickDateRange)} step={1} value={this.dateRangeToSliderIndex(this.props.currentTickDateRange)} onChange={this.onSliderChange} />
+                <Slider
+                    min={0}
+                    max={this.dateRangeToSliderIndex(this.props.endTickDateRange)}
+                    step={1}
+                    value={this.dateRangeToSliderIndex(this.props.currentTickDateRange)}
+                    onChange={this.onSliderChange} />
                 {!this.props.hidePlay && playStopButton}
             </div>
         );
