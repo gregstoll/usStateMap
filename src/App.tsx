@@ -32,13 +32,9 @@ export class App extends Component<{}, AppState> {
         alert("Error: " + this._errorStringFromError(error));
     }
 
-    randomColor = () => {
-        // Just use some nice red/blue colors
-        const _colors =
-            ['#67001f', '#b2182b', '#d6604d', '#f4a582', '#fddbc7', '#f7f7f7', '#d1e5f0', '#92c5de', '#4393c3', '#2166ac', '#053061'];
-        let idx = Math.floor(Math.random() * _colors.length);
-        return _colors[idx];
-    };
+    // Just use some nice red/blue colors
+    _colors =
+        ['#67001f', '#b2182b', '#d6604d', '#f4a582', '#fddbc7', '#f7f7f7', '#d1e5f0', '#92c5de', '#4393c3', '#2166ac', '#053061'];
 
     componentDidMount = () => {
         // You probably want to load some data here, we'll just make something up.
@@ -46,8 +42,9 @@ export class App extends Component<{}, AppState> {
         const stateCodes: Array<string> = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'];
         for (let year = MIN_YEAR; year <= MAX_YEAR; ++year) {
             let data = new Map<string, string>();
-            for (let stateCode of stateCodes) {
-                data.set(stateCode, this.randomColor());
+            for (let i = 0; i < stateCodes.length; ++i) {
+                let stateCode = stateCodes[i];
+                data.set(stateCode, this._colors[(i + year) % this._colors.length]);
             }
 
             tempFakeStateColors.set(year, data);
@@ -86,9 +83,9 @@ export class App extends Component<{}, AppState> {
             <div>State selected: {this.state.stateSelected || "None"}</div>
             <DateSlider
                 yearsPerTick={1}
-                startTickDateRange={new TickDateRange(MIN_YEAR, 11)}
-                endTickDateRange={new TickDateRange(MAX_YEAR, 11)}
-                currentTickDateRange={new TickDateRange(this.state.year, 11)}
+                startTickDateRange={new TickDateRange(MIN_YEAR)}
+                endTickDateRange={new TickDateRange(MAX_YEAR)}
+                currentTickDateRange={new TickDateRange(this.state.year)}
                 onTickDateRangeChange={this.onSliderDateChange}
               />
         </div>

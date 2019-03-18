@@ -47,12 +47,20 @@ export class TickDateRange {
      * Note that this is 0-indexed, so 0=January and 11=December.
      */
     public readonly endMonth: number
-    constructor(endYear: number, endMonth: number) {
+    /**
+     * Construct a new TickDateRange
+     * @param endYear The ending year that this date range represents.
+     * @param endMonth The ending year that this date range represents.
+     * Note that this is 0-indexed, so 0=January and 11=December.
+     * Optional: omitting this sets it to 11 (useful if ticks represent years)
+     */
+    constructor(endYear: number, endMonth?: number) {
         this.endYear = endYear;
-        if (endMonth < 0 || endMonth > 11) {
+        let realEndMonth: number = isUndefined(endMonth) ? 11 : endMonth;
+        if (realEndMonth < 0 || realEndMonth > 11) {
             throw `endMonth is out of range (must be >= 0 and < 12, got ${endMonth})`;
         }
-        this.endMonth = endMonth;
+        this.endMonth = realEndMonth;
     }
     equals(other: TickDateRange): boolean {
         return this.endYear == other.endYear && this.endMonth == other.endMonth;
