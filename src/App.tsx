@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StateMap, DateSlider, TickDateRange } from './lib';
+import { USStateMap, DateSlider, TickDateRange } from './lib';
 import { Button } from 'semantic-ui-react';
 import 'rc-slider/assets/index.css';
 import 'semantic-ui-css/semantic.min.css';
@@ -71,7 +71,7 @@ export class App extends Component<{}, AppState> {
             return <div>Loading</div>;
         }
         return <div style={{ width: 640, margin: "15px auto" }}>
-            <StateMap isCartogram={this.state.isCartogram}
+            <USStateMap isCartogram={this.state.isCartogram}
                 stateColors={this.state.fakeStateColors.get(this.state.year)}
                 stateTitles={new Map<string, string>()}
                 stateSelectedCallback={this.onStateSelected}
