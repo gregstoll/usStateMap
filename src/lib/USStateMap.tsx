@@ -7,7 +7,7 @@ import polylabel from 'polylabel';
 import { isNullOrUndefined } from 'util';
 import parseColor from 'parse-color';
 
-import './StateMap.css';
+import './USStateMap.css';
 
 interface USStateMapProps {
     /**
