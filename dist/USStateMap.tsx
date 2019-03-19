@@ -7,9 +7,9 @@ import polylabel from 'polylabel';
 import { isNullOrUndefined } from 'util';
 import parseColor from 'parse-color';
 
-import './StateMap.css';
+import './USStateMap.css';
 
-interface StateMapProps {
+interface USStateMapProps {
     /**
      * Map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to what color it should be.
      * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
@@ -41,14 +41,14 @@ interface StateMapProps {
     onError: (error: any) => void
 };
 
-interface StateMapDrawingInfo {
+interface USStateMapDrawingInfo {
     usTopoJson: any,
     cartogram: d3.Selection<HTMLElement, () => any, null, undefined>,
     stateInfos: StateInfos
 };
 
-interface StateMapState {
-    drawingInfo: StateMapDrawingInfo
+interface USStateMapState {
+    drawingInfo: USStateMapDrawingInfo
 }
 
 interface StateLineInfo {
@@ -57,7 +57,7 @@ interface StateLineInfo {
     lineTextPosition: [number, number]
 };
 
-export class StateMap extends Component<StateMapProps, StateMapState>{
+export class USStateMap extends Component<USStateMapProps, USStateMapState>{
     projection: d3.GeoProjection;
     geoPath: d3.GeoPath;
     labelLines: Map<string, StateLineInfo>;
@@ -81,14 +81,14 @@ export class StateMap extends Component<StateMapProps, StateMapState>{
         this.getDataAsync().then(value => {
             this.setState({ drawingInfo: value });
         }).catch(error => {
-            console.error("Error in StateMap: " + error);
+            console.error("Error in USStateMap: " + error);
             if (this.props.onError) {
                 this.props.onError(error);
             }
         });
     }
 
-    private async getDataAsync(): Promise<StateMapDrawingInfo> {
+    private async getDataAsync(): Promise<USStateMapDrawingInfo> {
         try {
             let usPromise = d3.json('data/us.json');
             let stateNamesPromise = d3.tsv('data/us-state-names.tsv', this.cleanStateName);
@@ -102,7 +102,7 @@ export class StateMap extends Component<StateMapProps, StateMapState>{
                 stateInfos: this.makeStateInfos(stateNames)
             };
         } catch (error) {
-            console.error("Error in StateMap: " + error);
+            console.error("Error in USStateMap: " + error);
             if (this.props.onError) {
                 this.props.onError(error);
             }
@@ -131,7 +131,7 @@ export class StateMap extends Component<StateMapProps, StateMapState>{
             const xml = await d3.xml('data/cartograms/fivethirtyeight.svg', { headers: new Headers({ "Content-Type": "image/svg+xml" }) });
             return d3.select(xml.documentElement);
         } catch (error) {
-            console.error("Error in StateMap cartogram: " + error);
+            console.error("Error in USStateMap cartogram: " + error);
             if (this.props.onError) {
                 this.props.onError(error);
             }
