@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "sourceMap": true,
     "jsx": "preserve",
     "lib": ["es2015", "dom", "es2015.promise"]
   },
