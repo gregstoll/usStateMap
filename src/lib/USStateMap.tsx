@@ -1,7 +1,7 @@
 import { Component } from 'react';
-import React from 'react';
+import * as React from 'react';
 import * as d3 from 'd3';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { StateName, StateInfos } from './DataHandling';
 import * as topojson from 'topojson'
 import polylabel from 'polylabel';

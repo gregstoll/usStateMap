@@ -1,7 +1,7 @@
 import { Component } from 'react';
-import React from 'react';
+import * as React from 'react';
 import { Button, Select } from 'semantic-ui-react';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { isUndefined } from 'util';

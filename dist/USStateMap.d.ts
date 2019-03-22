@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import React from 'react';
+import * as React from 'react';
 import * as d3 from 'd3';
 import { StateInfos } from './DataHandling';
 import './USStateMap.css';

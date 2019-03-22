@@ -49,9 +49,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var react_1 = require("react");
-var react_2 = require("react");
+var React = require("react");
 var d3 = require("d3");
-var lodash_1 = require("lodash");
+var _ = require("lodash");
 var topojson = require("topojson");
 var polylabel_1 = require("polylabel");
 var util_1 = require("util");
@@ -102,7 +102,7 @@ var USStateMap = /** @class */ (function (_super) {
                 var labelLineInfo = _this.labelLines.get(stateCode);
                 textPosition = labelLineInfo.lineTextPosition;
                 var linePath = "M " + labelLineInfo.lineStart[0] + "," + labelLineInfo.lineStart[1] + " L " + labelLineInfo.lineEnd[0] + "," + labelLineInfo.lineEnd[1] + " Z";
-                parts.push(react_2["default"].createElement("path", { key: stateCode + "line", name: stateCode + "line", d: linePath, className: "labelLine" }));
+                parts.push(React.createElement("path", { key: stateCode + "line", name: stateCode + "line", d: linePath, className: "labelLine" }));
                 backgroundColors.add(color);
                 var filterName = _this.filterNameFromColor(color);
                 filterText = "url(#" + filterName + ")";
@@ -110,10 +110,10 @@ var USStateMap = /** @class */ (function (_super) {
             else {
                 textPosition = _this.getCenter(parsedPath);
             }
-            parts.push(react_2["default"].createElement("path", { name: stateCode, d: path, style: { fill: color }, key: stateCode, onClick: _this.stateClick },
-                react_2["default"].createElement("title", null, title)));
-            parts.push(react_2["default"].createElement("text", { name: stateCode, x: textPosition[0], y: textPosition[1], key: stateCode + "text", dy: "0.25em", onClick: _this.stateClick, stroke: _this.getLabelColor(color), filter: filterText },
-                react_2["default"].createElement("title", null, title),
+            parts.push(React.createElement("path", { name: stateCode, d: path, style: { fill: color }, key: stateCode, onClick: _this.stateClick },
+                React.createElement("title", null, title)));
+            parts.push(React.createElement("text", { name: stateCode, x: textPosition[0], y: textPosition[1], key: stateCode + "text", dy: "0.25em", onClick: _this.stateClick, stroke: _this.getLabelColor(color), filter: filterText },
+                React.createElement("title", null, title),
                 stateCode));
             return parts;
         };
@@ -260,7 +260,7 @@ var USStateMap = /** @class */ (function (_super) {
         else {
             // Very rough heuristic to find the "main" path
             // could look at bounding box instead
-            var maxIndex = lodash_1["default"].maxBy(lodash_1["default"].range(0, shapes.length), function (index) { return shapes[index].length; });
+            var maxIndex = _.maxBy(_.range(0, shapes.length), function (index) { return shapes[index].length; });
             return polylabel_1["default"]([shapes[maxIndex]]);
         }
     };
@@ -277,7 +277,7 @@ var USStateMap = /** @class */ (function (_super) {
     };
     USStateMap.prototype.render = function () {
         if (util_1.isNullOrUndefined(this.state.drawingInfo)) {
-            return react_2["default"].createElement("div", null, "Loading...");
+            return React.createElement("div", null, "Loading...");
         }
         // https://d3-geomap.github.io/map/choropleth/us-states/
         //const map = d3.geomap.choropleth().geofile('/d3-geomap/topojson/countries/USA.json').projection(this.projection);
@@ -344,13 +344,13 @@ var USStateMap = /** @class */ (function (_super) {
         for (var _b = 0, _c = Array.from(backgroundColors.values()); _b < _c.length; _b++) {
             var color = _c[_b];
             var filterName = this.filterNameFromColor(color);
-            filters.push(react_2["default"].createElement("filter", { x: "0", y: "0", width: "1", height: "1", id: filterName, key: filterName },
-                react_2["default"].createElement("feFlood", { floodColor: color }),
-                react_2["default"].createElement("feComposite", { "in": "SourceGraphic" })));
+            filters.push(React.createElement("filter", { x: "0", y: "0", width: "1", height: "1", id: filterName, key: filterName },
+                React.createElement("feFlood", { floodColor: color }),
+                React.createElement("feComposite", { "in": "SourceGraphic" })));
         }
-        return react_2["default"].createElement("svg", { width: this.props.width, height: this.props.height, onClick: this.rootClick },
-            react_2["default"].createElement("g", { transform: "scale(" + scale + " " + scale + ") translate(" + (this.props.x + xOffset) + ", " + (this.props.y + yOffset) + ")", onClick: this.rootClick },
-                react_2["default"].createElement("defs", null, filters),
+        return React.createElement("svg", { width: this.props.width, height: this.props.height, onClick: this.rootClick },
+            React.createElement("g", { transform: "scale(" + scale + " " + scale + ") translate(" + (this.props.x + xOffset) + ", " + (this.props.y + yOffset) + ")", onClick: this.rootClick },
+                React.createElement("defs", null, filters),
                 paths));
     };
     return USStateMap;

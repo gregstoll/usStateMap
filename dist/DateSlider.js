@@ -14,7 +14,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var react_1 = require("react");
-var react_2 = require("react");
+var React = require("react");
 var semantic_ui_react_1 = require("semantic-ui-react");
 var rc_slider_1 = require("rc-slider");
 require("rc-slider/assets/index.css");
@@ -127,13 +127,13 @@ var DateSlider = /** @class */ (function (_super) {
     };
     DateSlider.prototype.render = function () {
         var _this = this;
-        var playStopButton = react_2["default"].createElement("div", null,
-            react_2["default"].createElement(semantic_ui_react_1.Button, { onClick: function () { return _this.clickStopPlayButton(); } }, this.state.isPlaying ? "Stop" : "Play"),
+        var playStopButton = React.createElement("div", null,
+            React.createElement(semantic_ui_react_1.Button, { onClick: function () { return _this.clickStopPlayButton(); } }, this.state.isPlaying ? "Stop" : "Play"),
             "Speed: ",
-            react_2["default"].createElement(semantic_ui_react_1.Select, { options: DateSlider.speedOptions(), value: this.state.playSpeed, onChange: this.changeSpeed }));
+            React.createElement(semantic_ui_react_1.Select, { options: DateSlider.speedOptions(), value: this.state.playSpeed, onChange: this.changeSpeed }));
         // https://react-component.github.io/slider/examples/slider.html
-        return (react_2["default"].createElement("div", { style: { width: 500 }, className: "centerFixedWidth" },
-            react_2["default"].createElement(rc_slider_1["default"], { min: 0, max: this.dateRangeToSliderIndex(this.props.endTickDateRange), step: 1, value: this.dateRangeToSliderIndex(this.props.currentTickDateRange), onChange: this.onSliderChange }),
+        return (React.createElement("div", { style: { width: 500 }, className: "centerFixedWidth" },
+            React.createElement(rc_slider_1["default"], { min: 0, max: this.dateRangeToSliderIndex(this.props.endTickDateRange), step: 1, value: this.dateRangeToSliderIndex(this.props.currentTickDateRange), onChange: this.onSliderChange }),
             !this.props.hidePlay && playStopButton));
     };
     return DateSlider;
