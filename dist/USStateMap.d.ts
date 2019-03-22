@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import React from 'react';
 import * as d3 from 'd3';
 import { StateInfos } from './DataHandling';
 import './USStateMap.css';
@@ -59,8 +60,8 @@ export declare class USStateMap extends Component<USStateMapProps, USStateMapSta
     private getCartogramAsync;
     initLabelLines(): void;
     updateD3(props: any): void;
-    stateClick: (event: any) => void;
-    rootClick: (event: any) => void;
+    stateClick: (event: React.MouseEvent<SVGElement, MouseEvent>) => void;
+    rootClick: (event: React.MouseEvent<SVGGElement, MouseEvent>) => void;
     getSVGPaths: (stateCode: string, stateName: string, path: string, backgroundColors: Set<string>) => JSX.Element[];
     filterNameFromColor(color: string): string;
     getLabelColor(backgroundColor: string): string;

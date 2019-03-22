@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
+import React from 'react';
 import { Button, Select } from 'semantic-ui-react';
 import _ from 'lodash';
 import Slider from 'rc-slider';
