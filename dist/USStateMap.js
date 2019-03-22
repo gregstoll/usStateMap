@@ -53,9 +53,10 @@ var React = require("react");
 var d3 = require("d3");
 var _ = require("lodash");
 var topojson = require("topojson");
-var polylabel_1 = require("polylabel");
 var util_1 = require("util");
-var parse_color_1 = require("parse-color");
+// not sure why these are necessary this way?
+var polylabel = require('polylabel');
+var parseColor = require('parse-color');
 require("./USStateMap.css");
 ;
 ;
@@ -235,11 +236,11 @@ var USStateMap = /** @class */ (function (_super) {
             .scale(actualDimension * 1.0);
     };
     USStateMap.prototype.filterNameFromColor = function (color) {
-        var parsedColor = parse_color_1["default"](color);
+        var parsedColor = parseColor(color);
         return "color" + parsedColor.hex.substr(1);
     };
     USStateMap.prototype.getLabelColor = function (backgroundColor) {
-        var backgroundParsedColor = parse_color_1["default"](backgroundColor);
+        var backgroundParsedColor = parseColor(backgroundColor);
         // Used to use HSL, but I think this is more accurate
         var rgb = backgroundParsedColor.rgb;
         if (util_1.isNullOrUndefined(rgb)) {
@@ -255,13 +256,13 @@ var USStateMap = /** @class */ (function (_super) {
     };
     USStateMap.prototype.getCenter = function (shapes) {
         if (this.props.isCartogram) {
-            return polylabel_1["default"]([shapes[0]]);
+            return polylabel([shapes[0]]);
         }
         else {
             // Very rough heuristic to find the "main" path
             // could look at bounding box instead
             var maxIndex = _.maxBy(_.range(0, shapes.length), function (index) { return shapes[index].length; });
-            return polylabel_1["default"]([shapes[maxIndex]]);
+            return polylabel([shapes[maxIndex]]);
         }
     };
     USStateMap.prototype.parsePath = function (str) {
