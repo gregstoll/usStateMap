@@ -23,8 +23,10 @@
     "build-examples": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "build": "npm run clean && cross-env NODE_ENV=production babel src/lib --out-dir dist-ts --copy-files --ignore __tests__,spec.js,test.js,__snapshots__ && tsc dist-ts/index.tsx --outDir dist -d --sourceMap --declarationMap --jsx \"React\" && copyfiles --flat dist-ts/*.css dist",
-    "clean": "rimraf dist && rimraf dist-ts"
+    "build": "npm run clean && npm run build-ts && npm run build-js",
+    "clean": "rimraf dist && rimraf dist-ts",
+    "build-ts": "cross-env NODE_ENV=production babel src/lib --out-dir dist-ts --copy-files --ignore __tests__,spec.js,test.js,__snapshots__",
+    "build-js": "tsc dist-ts/index.tsx --outDir dist -d --sourceMap --declarationMap --jsx \"React\" && copyfiles --flat dist-ts/*.css dist"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
