@@ -12,6 +12,10 @@
     "type": "git",
     "url": "git+https://github.com/gregstoll/usStateMap.git"
   },
+  "keywords": [
+    "map",
+    "state"
+  ],
   "author": "Greg Stoll <greg@gregstoll.com>  (https://gregstoll.com)",
   "license": "MIT",
   "bugs": {
