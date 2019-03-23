@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
+import * as React from 'react';
 import * as d3 from 'd3';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { StateName, StateInfos } from './DataHandling';
 import * as topojson from 'topojson'
-import polylabel from 'polylabel';
 import { isNullOrUndefined } from 'util';
-import parseColor from 'parse-color';
+// not sure why these are necessary this way?
+let polylabel = require('polylabel');
+let parseColor = require('parse-color');
 
 import './USStateMap.css';
 

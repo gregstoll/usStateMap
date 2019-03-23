@@ -14,7 +14,11 @@
     "noEmit": true,
     "sourceMap": true,
     "jsx": "preserve",
-    "lib": ["es2015", "dom", "es2015.promise"]
+    "lib": [
+      "es2015",
+      "dom",
+      "es2015.promise"
+    ]
   },
   "include": [
     "src"
