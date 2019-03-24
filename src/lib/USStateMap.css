@@ -1,4 +1,4 @@
-path {
+path.usState, path.labelLine {
     stroke-width: 1px;
     stroke: gray;
 }
@@ -7,7 +7,7 @@ path {
     stroke-width: 1.5px;
 }
 
-text {
+text.usState {
     font: 20px Helvetica, Arial, sans-serif;
     fill: #999;
     font-weight: 500;
@@ -17,7 +17,7 @@ text {
    stroke-width: 0.3em;
 }
 
-g text {
+g.usStateG text.usStateText {
     text-anchor: middle;
     font-size: 10px;
     font-weight: 200;

@@ -212,10 +212,10 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         else {
             textPosition = this.getCenter(parsedPath);
         }
-        parts.push(<path name={stateCode} d={path} style={{ fill: color }} key={stateCode} onClick={this.stateClick}>
+        parts.push(<path className="usState" name={stateCode} d={path} style={{ fill: color }} key={stateCode} onClick={this.stateClick}>
             <title>{title}</title>
         </path>);
-        parts.push(<text name={stateCode} x={textPosition[0]} y={textPosition[1]} key={stateCode + "text"}
+        parts.push(<text className="usStateText" name={stateCode} x={textPosition[0]} y={textPosition[1]} key={stateCode + "text"}
             dy="0.25em" onClick={this.stateClick} stroke={this.getLabelColor(color)} filter={filterText}><title>{title}</title>{stateCode}</text>);
         return parts;
     };
@@ -336,7 +336,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
             </filter>);
         }
         return <svg width={this.props.width} height={this.props.height} onClick={this.rootClick}>
-            <g transform={`scale(${scale} ${scale}) translate(${this.props.x + xOffset}, ${this.props.y + yOffset})`} onClick={this.rootClick}>
+            <g className="usStateG" transform={`scale(${scale} ${scale}) translate(${this.props.x + xOffset}, ${this.props.y + yOffset})`} onClick={this.rootClick}>
                 <defs>
                     {filters}
                 </defs>
