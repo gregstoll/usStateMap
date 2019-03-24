@@ -111,9 +111,9 @@ var USStateMap = /** @class */ (function (_super) {
             else {
                 textPosition = _this.getCenter(parsedPath);
             }
-            parts.push(React.createElement("path", { name: stateCode, d: path, style: { fill: color }, key: stateCode, onClick: _this.stateClick },
+            parts.push(React.createElement("path", { className: "usState", name: stateCode, d: path, style: { fill: color }, key: stateCode, onClick: _this.stateClick },
                 React.createElement("title", null, title)));
-            parts.push(React.createElement("text", { name: stateCode, x: textPosition[0], y: textPosition[1], key: stateCode + "text", dy: "0.25em", onClick: _this.stateClick, stroke: _this.getLabelColor(color), filter: filterText },
+            parts.push(React.createElement("text", { className: "usStateText", name: stateCode, x: textPosition[0], y: textPosition[1], key: stateCode + "text", dy: "0.25em", onClick: _this.stateClick, stroke: _this.getLabelColor(color), filter: filterText },
                 React.createElement("title", null, title),
                 stateCode));
             return parts;
@@ -349,8 +349,10 @@ var USStateMap = /** @class */ (function (_super) {
                 React.createElement("feFlood", { floodColor: color }),
                 React.createElement("feComposite", { "in": "SourceGraphic" })));
         }
+        var xTranslation = xOffset + (util_1.isUndefined(this.props.x) ? 0 : this.props.x);
+        var yTranslation = yOffset + (util_1.isUndefined(this.props.y) ? 0 : this.props.y);
         return React.createElement("svg", { width: this.props.width, height: this.props.height, onClick: this.rootClick },
-            React.createElement("g", { transform: "scale(" + scale + " " + scale + ") translate(" + (this.props.x + xOffset) + ", " + (this.props.y + yOffset) + ")", onClick: this.rootClick },
+            React.createElement("g", { className: "usStateG", transform: "scale(" + scale + " " + scale + ") translate(" + xTranslation + ", " + yTranslation + ")", onClick: this.rootClick },
                 React.createElement("defs", null, filters),
                 paths));
     };

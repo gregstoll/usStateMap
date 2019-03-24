@@ -25,9 +25,21 @@ interface USStateMapProps {
      * Whether the map is a cartogram (state sizes roughly proportional to population) or not.
      * */
     isCartogram: boolean;
-    x: number;
-    y: number;
+    /**
+     * Optional offset in the x direction for the map. Defaults to 0.
+     * */
+    x?: number;
+    /**
+     * Optional offset in the y direction for the map. Defaults to 0.
+     * */
+    y?: number;
+    /**
+     * Width of the map. 900 seems like a good value.
+     * */
     width: number;
+    /**
+     * Height of the map. 500 seems like a good value.
+     * */
     height: number;
     /**
      * Callback that is called when there's an error loading data.
