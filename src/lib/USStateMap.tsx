@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { StateName, StateInfos } from './DataHandling';
 import * as topojson from 'topojson'
-import { isNullOrUndefined } from 'util';
+import { isNullOrUndefined, isUndefined } from 'util';
 // not sure why these are necessary this way?
 let polylabel = require('polylabel');
 let parseColor = require('parse-color');
@@ -33,8 +33,14 @@ interface USStateMapProps {
      * Whether the map is a cartogram (state sizes roughly proportional to population) or not.
      * */
     isCartogram: boolean,
-    x: number,
-    y: number,
+    /**
+     * Optional offset in the x direction for the map. Defaults to 0.
+     */
+    x?: number,
+    /**
+     * Optional offset in the y direction for the map. Defaults to 0.
+     */
+    y?: number,
     width: number,
     height: number,
     /**
@@ -335,8 +341,10 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
                 <feComposite in="SourceGraphic" />
             </filter>);
         }
+        let xTranslation = xOffset + (isUndefined(this.props.x) ? 0 : this.props.x);
+        let yTranslation = yOffset + (isUndefined(this.props.y) ? 0 : this.props.y);
         return <svg width={this.props.width} height={this.props.height} onClick={this.rootClick}>
-            <g className="usStateG" transform={`scale(${scale} ${scale}) translate(${this.props.x + xOffset}, ${this.props.y + yOffset})`} onClick={this.rootClick}>
+            <g className="usStateG" transform={`scale(${scale} ${scale}) translate(${xTranslation}, ${yTranslation})`} onClick={this.rootClick}>
                 <defs>
                     {filters}
                 </defs>

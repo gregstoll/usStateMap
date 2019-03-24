@@ -76,8 +76,6 @@ export class App extends Component<{}, AppState> {
                 stateTitles={new Map<string, string>()}
                 stateSelectedCallback={this.onStateSelected}
                 stateClearedCallback={this.onStateCleared}
-                x={0}
-                y={0}
                 width={900}
                 height={500}
                 onError={this.onMapError} />
