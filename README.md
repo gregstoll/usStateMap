@@ -18,10 +18,14 @@ The main map component.  It has props:
      Optional callback when a part of the map that is not a state is tapped.
   - `isCartogram: boolean`
      Whether the map is a cartogram (state sizes roughly proportional to population) or not.
-  - `x: number`
-  - `y: number`
+  - `x?: number`
+     Optional offset in the x direction for the map. Defaults to 0.
+  - `y?: number`
+     Optional offset in the y direction for the map. Defaults to 0.
   - `width: number`
+     Width of the map. 900 seems like a good value.
   - `height: number`
+     Height of the map. 500 seems like a good value.
   - `onError: (error: any) => void`
      Callback that is called when there's an error loading data.
 
@@ -44,15 +48,15 @@ A slider that can display months or years.  It has props:
      Callback called when the tick changes (whether the user changes it or
      it automatically advances because it's playing)
   - `hidePlay?: boolean`
-    Whether to hide the Play/Stop button and speed controls.  Default
-    is to show them.
+     Whether to hide the Play/Stop button and speed controls.  Default
+     is to show them.
 
 ## TickDateRange
 Represents a date range of a tick on the slider.
 The year and month represent the end of the range, while the beginning of the range can be calculated by looking at `ticksPerYear` or `yearsPerTick`, although I expect most applications will set these to be constants so your code can assume what they are.
 It has properties:
   - `endYear: number`
-    The ending year that this date range represents.
+     The ending year that this date range represents.
   - `endMonth: number`
      The ending month that this date range represents.
      Note that this is 0-indexed, so 0=January and 11=December.
