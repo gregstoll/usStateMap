@@ -3,6 +3,8 @@ React component for displaying colors on a US state map. Available on npm as [us
 
 See the included app for usage, or see [stateElectionMap](https://github.com/gregstoll/stateElectionMap) for another example.
 
+**Note:** You must copy the files in [`public/data`](https://github.com/gregstoll/usStateMap/tree/master/public/data) to your app's `public/data` directory.  (issue [#2](https://github.com/gregstoll/usStateMap/issues/2) is looking for a better way to handle this)
+
 The main components are:
 
 ## USStateMap
