@@ -3,6 +3,7 @@ import { USStateMap, DateSlider, TickDateRange } from './lib';
 import { Button } from 'semantic-ui-react';
 import 'rc-slider/assets/index.css';
 import 'semantic-ui-css/semantic.min.css';
+import { DateSliderSpeedEnum } from './lib/DateSlider';
 
 interface AppState {
     year: number,

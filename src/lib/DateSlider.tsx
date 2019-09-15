@@ -4,7 +4,17 @@ import { Button, Select } from 'semantic-ui-react';
 import * as _ from 'lodash';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import { isUndefined } from 'util';
+import { isUndefined, isNullOrUndefined } from 'util';
+
+export enum DateSliderSpeedEnum {
+    VerySlow = 2500,
+    Slow = 1250,
+    Normal = 500,
+    Fast = 250,
+    VeryFast = 0
+}
+
+type DateSliderSpeed = keyof typeof DateSliderSpeedEnum
 
 export interface DateSliderProps {
     /** 
@@ -32,7 +42,11 @@ export interface DateSliderProps {
     /**
      * Whether to hide the Play/Stop button and speed controls.  Default
      * is to show them. */
-    hidePlay?: boolean
+    hidePlay?: boolean,
+    /**
+     * The initial speed of the slider.  Default is Normal.
+     */
+    initialSpeed?: DateSliderSpeedEnum
 }
 
 /** Represents a date range of a tick on the slider.
@@ -70,17 +84,17 @@ export class TickDateRange {
 
 interface DateSliderState {
     isPlaying: boolean,
-    playSpeed: number
+    playSpeed: DateSliderSpeedEnum
 }
 
 export class DateSlider extends Component<DateSliderProps, DateSliderState> {
-    constructor(props) {
+    constructor(props : DateSliderProps) {
         super(props);
         if ((this.props.ticksPerYear === undefined) == (this.props.yearsPerTick === undefined)) {
             console.error("Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!");
             throw "Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!";
         }
-        this.state = { isPlaying: false, playSpeed: DateSlider.speedOptions()[2].value };
+        this.state = { isPlaying: false, playSpeed: isNullOrUndefined(props.initialSpeed) ? DateSliderSpeedEnum.Normal : props.initialSpeed };
     }
 
     /**
@@ -140,12 +154,15 @@ export class DateSlider extends Component<DateSliderProps, DateSliderState> {
         }
     }
 
+    static pascalCaseToString(s: string) : string {
+        let withSpaces = s.replace(/([A-Z])/g, " $1").trim();
+        return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1).toLowerCase();
+    }
     static speedOptions() {
-        return [{ key: 'verySlow', value: 2500, text: "Very slow" },
-            { key: 'slow', value: 1250, text: "Slow" },
-            { key: 'normal', value: 500, text: "Normal" },
-            { key: 'fast', value: 250, text: "Fast" },
-            { key: 'veryFast', value: 0, text: "Very fast" }];
+        // https://stackoverflow.com/questions/21293063/how-to-programmatically-enumerate-an-enum-type
+        const dateSliderSpeedNames = Object.keys(DateSliderSpeedEnum)
+            .filter(k => typeof DateSliderSpeedEnum[k as any] === "number") as DateSliderSpeed[];
+        return dateSliderSpeedNames.map(speed => {return {key: speed, text: DateSlider.pascalCaseToString(speed), value: DateSliderSpeedEnum[speed]}});
     }
 
     changeSpeed = (event, { value } ) => {
