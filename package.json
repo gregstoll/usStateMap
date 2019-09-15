@@ -36,29 +36,29 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^7.0.1",
-    "copyfiles": "^2.1.0",
-    "cross-env": "^5.2.0",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
+    "copyfiles": "^2.1.1",
+    "cross-env": "^5.2.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
     "react-scripts": "^2.1.8",
-    "rimraf": "^2.6.3"
+    "rimraf": "^2.7.1"
   },
   "dependencies": {
-    "@types/d3": "^5.7.1",
-    "@types/lodash": "^4.14.123",
+    "@types/d3": "^5.7.2",
+    "@types/lodash": "^4.14.138",
     "@types/polylabel": "^1.0.5",
-    "@types/react": "^16.8.8",
-    "@types/react-dom": "^16.8.2",
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
     "@types/semantic-ui": "^2.2.7",
-    "d3": "^5.9.1",
-    "lodash": "^4.17.11",
+    "d3": "^5.12.0",
+    "lodash": "^4.17.15",
     "parse-color": "^1.0.0",
     "polylabel": "^1.0.2",
-    "rc-slider": "^8.6.6",
+    "rc-slider": "^8.7.1",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.85.0",
     "topojson": "^3.0.2",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.6.3"
   },
   "browserslist": [
     ">0.2%",
