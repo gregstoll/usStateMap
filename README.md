@@ -52,6 +52,11 @@ A slider that can display months or years.  It has props:
   - `hidePlay?: boolean`
      Whether to hide the Play/Stop button and speed controls.  Default
      is to show them.
+  - `initialSpeed?: DateSpeedSliderEnum`
+     The initial speed of the slider.  Default is `Normal`
+  - `cssProps?: React.CSSProperties`
+     CSS properties to apply to the div containing the slider.  Default is 
+     `{width: 500}`
 
 ## TickDateRange
 Represents a date range of a tick on the slider.
