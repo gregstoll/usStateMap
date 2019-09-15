@@ -1,5 +1,13 @@
 import { Component } from 'react';
+import * as React from 'react';
 import 'rc-slider/assets/index.css';
+export declare enum DateSliderSpeedEnum {
+    VerySlow = 2500,
+    Slow = 1250,
+    Normal = 500,
+    Fast = 250,
+    VeryFast = 0
+}
 export interface DateSliderProps {
     /**
      *  The number of ticks per year, if a year is made up of multiple ticks.  If this
@@ -27,6 +35,15 @@ export interface DateSliderProps {
      * Whether to hide the Play/Stop button and speed controls.  Default
      * is to show them. */
     hidePlay?: boolean;
+    /**
+     * The initial speed of the slider.  Default is Normal.
+     */
+    initialSpeed?: DateSliderSpeedEnum;
+    /**
+     * CSS properties to apply to the div containing the slider.
+     * Default is {width: 500}
+     */
+    cssProps?: React.CSSProperties;
 }
 /** Represents a date range of a tick on the slider.
  * The year and month represent the end of the range, while the
@@ -53,10 +70,10 @@ export declare class TickDateRange {
 }
 interface DateSliderState {
     isPlaying: boolean;
-    playSpeed: number;
+    playSpeed: DateSliderSpeedEnum;
 }
 export declare class DateSlider extends Component<DateSliderProps, DateSliderState> {
-    constructor(props: any);
+    constructor(props: DateSliderProps);
     /**
      * How many months the date advances per tick.
      * */
@@ -68,10 +85,11 @@ export declare class DateSlider extends Component<DateSliderProps, DateSliderSta
     callAdvanceDateInFuture: () => void;
     sliderAtEnd(): boolean;
     clickStopPlayButton: () => void;
+    static pascalCaseToString(s: string): string;
     static speedOptions(): {
-        key: string;
-        value: number;
+        key: "VerySlow" | "Slow" | "Normal" | "Fast" | "VeryFast";
         text: string;
+        value: DateSliderSpeedEnum;
     }[];
     changeSpeed: (event: any, { value }: {
         value: any;

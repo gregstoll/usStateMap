@@ -19,6 +19,14 @@ var semantic_ui_react_1 = require("semantic-ui-react");
 var rc_slider_1 = require("rc-slider");
 require("rc-slider/assets/index.css");
 var util_1 = require("util");
+var DateSliderSpeedEnum;
+(function (DateSliderSpeedEnum) {
+    DateSliderSpeedEnum[DateSliderSpeedEnum["VerySlow"] = 2500] = "VerySlow";
+    DateSliderSpeedEnum[DateSliderSpeedEnum["Slow"] = 1250] = "Slow";
+    DateSliderSpeedEnum[DateSliderSpeedEnum["Normal"] = 500] = "Normal";
+    DateSliderSpeedEnum[DateSliderSpeedEnum["Fast"] = 250] = "Fast";
+    DateSliderSpeedEnum[DateSliderSpeedEnum["VeryFast"] = 0] = "VeryFast";
+})(DateSliderSpeedEnum = exports.DateSliderSpeedEnum || (exports.DateSliderSpeedEnum = {}));
 /** Represents a date range of a tick on the slider.
  * The year and month represent the end of the range, while the
  * beginning of the range can be calculated by looking at
@@ -91,7 +99,7 @@ var DateSlider = /** @class */ (function (_super) {
             console.error("Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!");
             throw "Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!";
         }
-        _this.state = { isPlaying: false, playSpeed: DateSlider.speedOptions()[2].value };
+        _this.state = { isPlaying: false, playSpeed: util_1.isNullOrUndefined(props.initialSpeed) ? DateSliderSpeedEnum.Normal : props.initialSpeed };
         return _this;
     }
     /**
@@ -118,12 +126,15 @@ var DateSlider = /** @class */ (function (_super) {
     DateSlider.prototype.sliderAtEnd = function () {
         return this.props.currentTickDateRange.equals(this.props.endTickDateRange);
     };
+    DateSlider.pascalCaseToString = function (s) {
+        var withSpaces = s.replace(/([A-Z])/g, " $1").trim();
+        return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1).toLowerCase();
+    };
     DateSlider.speedOptions = function () {
-        return [{ key: 'verySlow', value: 2500, text: "Very slow" },
-            { key: 'slow', value: 1250, text: "Slow" },
-            { key: 'normal', value: 500, text: "Normal" },
-            { key: 'fast', value: 250, text: "Fast" },
-            { key: 'veryFast', value: 0, text: "Very fast" }];
+        // https://stackoverflow.com/questions/21293063/how-to-programmatically-enumerate-an-enum-type
+        var dateSliderSpeedNames = Object.keys(DateSliderSpeedEnum)
+            .filter(function (k) { return typeof DateSliderSpeedEnum[k] === "number"; });
+        return dateSliderSpeedNames.map(function (speed) { return { key: speed, text: DateSlider.pascalCaseToString(speed), value: DateSliderSpeedEnum[speed] }; });
     };
     DateSlider.prototype.render = function () {
         var _this = this;
@@ -131,8 +142,9 @@ var DateSlider = /** @class */ (function (_super) {
             React.createElement(semantic_ui_react_1.Button, { onClick: function () { return _this.clickStopPlayButton(); } }, this.state.isPlaying ? "Stop" : "Play"),
             "Speed: ",
             React.createElement(semantic_ui_react_1.Select, { options: DateSlider.speedOptions(), value: this.state.playSpeed, onChange: this.changeSpeed }));
+        var sliderProps = util_1.isNullOrUndefined(this.props.cssProps) ? { width: 500 } : this.props.cssProps;
         // https://react-component.github.io/slider/examples/slider.html
-        return (React.createElement("div", { style: { width: 500 }, className: "centerFixedWidth" },
+        return (React.createElement("div", { style: sliderProps, className: "centerFixedWidth" },
             React.createElement(rc_slider_1["default"], { min: 0, max: this.dateRangeToSliderIndex(this.props.endTickDateRange), step: 1, value: this.dateRangeToSliderIndex(this.props.currentTickDateRange), onChange: this.onSliderChange }),
             !this.props.hidePlay && playStopButton));
     };
