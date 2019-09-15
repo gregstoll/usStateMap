@@ -47,6 +47,11 @@ export interface DateSliderProps {
      * The initial speed of the slider.  Default is Normal.
      */
     initialSpeed?: DateSliderSpeedEnum
+    /**
+     * CSS properties to apply to the div containing the slider.
+     * Default is {width: 500}
+     */
+    cssProps?: React.CSSProperties
 }
 
 /** Represents a date range of a tick on the slider.
@@ -175,9 +180,10 @@ export class DateSlider extends Component<DateSliderProps, DateSliderState> {
                 <Button onClick={() => this.clickStopPlayButton()}>{this.state.isPlaying ? "Stop" : "Play"}</Button>
                 Speed: <Select options={DateSlider.speedOptions()} value={this.state.playSpeed} onChange={this.changeSpeed} />
             </div>;
+        let sliderProps = isNullOrUndefined(this.props.cssProps) ? {width: 500} : this.props.cssProps;
         // https://react-component.github.io/slider/examples/slider.html
         return (
-            <div style={{ width: 500 }} className="centerFixedWidth">
+            <div style={sliderProps} className="centerFixedWidth">
                 <Slider
                     min={0}
                     max={this.dateRangeToSliderIndex(this.props.endTickDateRange)}
