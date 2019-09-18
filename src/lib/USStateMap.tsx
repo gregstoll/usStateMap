@@ -11,12 +11,37 @@ let parseColor = require('parse-color');
 
 import './USStateMap.css';
 
+export enum GradientDirection {
+    Up,
+    Down,
+    Left,
+    Right
+}
+
+export interface ColorGradient {
+    /**
+     * The "main" color of the state, used to calculate what color text to use
+     * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
+     * */
+    mainColor: string,
+    /**
+     * The other color of the state.
+     * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
+     */
+    secondaryColor: string
+    /**
+     * The direction for the gradient to go in.
+     * For eample, Up means the mainColor will be at the bottom and the secondaryColor will be at the top.
+     */
+    direction: GradientDirection
+}
+
 interface USStateMapProps {
     /**
      * Map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to what color it should be.
      * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
      * */
-    stateColors: Map<string, string>,
+    stateColors: Map<string, string | ColorGradient>,
     /**
      * Optional map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to the label on the tooltip.
      * */
