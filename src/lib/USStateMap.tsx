@@ -18,6 +18,10 @@ export enum GradientDirection {
     Right
 }
 
+// TODO more fully featured, like
+// gradient.addColorStop(0.0, color);
+// gradient.addColorStop(0.4, color);
+// gradient.addColorStop(1.0, "rgb(20, 118, 255)");
 export interface ColorGradient {
     /**
      * The "main" color of the state, used to calculate what color text to use
