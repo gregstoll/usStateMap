@@ -41,7 +41,7 @@ interface USStateMapProps {
      * Map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to what color it should be.
      * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
      * */
-    stateColors: Map<string, string | ColorGradient>,
+    stateColors: Map<string, string>,
     /**
      * Optional map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to the label on the tooltip.
      * */
@@ -225,7 +225,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         }
     }
 
-    getSVGPaths = (stateCode: string, stateName: string, path: string, backgroundColors: Set<string>): Array<JSX.Element> => {
+    getSVGPaths = (stateCode: string, stateName: string, path: string): Array<JSX.Element> => {
         if (isNullOrUndefined(path)) {
             return [];
         }
@@ -235,16 +235,12 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         const title = isNullOrUndefined(titleExtra) ? stateName : `${stateName}: ${titleExtra}`;
         let textPosition: [number, number];
         let parts = [];
-        let filterText = "";
         // only use labelLines in non-cartogram mode - state codes fit inside all the states in cartogram mode
         if (!this.props.isCartogram && this.labelLines.has(stateCode)) {
             const labelLineInfo = this.labelLines.get(stateCode);
             textPosition = labelLineInfo.lineTextPosition;
             const linePath = `M ${labelLineInfo.lineStart[0]},${labelLineInfo.lineStart[1]} L ${labelLineInfo.lineEnd[0]},${labelLineInfo.lineEnd[1]} Z`;
             parts.push(<path key={stateCode + "line"} name={stateCode + "line"} d={linePath} className="labelLine"/>);
-            backgroundColors.add(color);
-            let filterName = this.filterNameFromColor(color);
-            filterText = `url(#${filterName})`;
         }
         else {
             textPosition = this.getCenter(parsedPath);
@@ -252,15 +248,18 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         parts.push(<path className="usState" name={stateCode} d={path} style={{ fill: color }} key={stateCode} onClick={this.stateClick}>
             <title>{title}</title>
         </path>);
+        if (!this.props.isCartogram && this.labelLines.has(stateCode)) {
+            // https://stackoverflow.com/a/41902064/118417
+            // This is a somewhat hacky but easy way to get a background for an SVG text element.
+            // Note that we use "HH" since we know all of these state codes are two characters, and
+            // "H" doesn't cause any weird edges. (try "XX" or "VV" to see the weirdness)
+            parts.push(<text className="usStateText" name={stateCode} x={textPosition[0]} y={textPosition[1]} key={stateCode + "textBackground"}
+                dy="0.25em" onClick={this.stateClick} stroke={color} strokeWidth="0.6em"><title>{title}</title>HH</text>);
+        }
         parts.push(<text className="usStateText" name={stateCode} x={textPosition[0]} y={textPosition[1]} key={stateCode + "text"}
-            dy="0.25em" onClick={this.stateClick} stroke={this.getLabelColor(color)} filter={filterText}><title>{title}</title>{stateCode}</text>);
+            dy="0.25em" onClick={this.stateClick} stroke={this.getLabelColor(color)}><title>{title}</title>{stateCode}</text>);
         return parts;
     };
-
-    filterNameFromColor(color: string): string {
-        let parsedColor = parseColor(color);
-        return "color" + (parsedColor.hex as string).substr(1);
-    }
 
     getLabelColor(backgroundColor: string): string {
         let backgroundParsedColor = parseColor(backgroundColor);
@@ -308,7 +307,6 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         // https://d3-geomap.github.io/map/choropleth/us-states/
         //const map = d3.geomap.choropleth().geofile('/d3-geomap/topojson/countries/USA.json').projection(this.projection);
         let paths: JSX.Element[] = [];
-        let backgroundColors = new Set<string>();
         let scale = 1, xOffset = 0, yOffset = 0;
         if (!this.props.isCartogram) {
             const us = this.state.drawingInfo.usTopoJson;
@@ -320,7 +318,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
                 let stateId = topoState.id;
                 let stateNameObj = this.state.drawingInfo.stateInfos.idToStateName.get(stateId);
                 let stateCode = stateNameObj.code;
-                for (let path of this.getSVGPaths(stateCode, stateNameObj.name, this.geoPath(topojson.feature(us, topoState)), backgroundColors)) {
+                for (let path of this.getSVGPaths(stateCode, stateNameObj.name, this.geoPath(topojson.feature(us, topoState)))) {
                     paths.push(path);
                 }
             }
@@ -332,7 +330,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
                 let stateCode = thisPath.getAttribute("id");
                 let stateNameObj = that.state.drawingInfo.stateInfos.codeToStateName.get(stateCode);
                 let pathString = thisPath.getAttribute("d");
-                for (let path of that.getSVGPaths(stateCode, stateNameObj.name, pathString, backgroundColors)) {
+                for (let path of that.getSVGPaths(stateCode, stateNameObj.name, pathString)) {
                     paths.push(path);
                 }
             });
@@ -364,21 +362,10 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
             }
             return 0;
         });
-        let filters: JSX.Element[] = [];
-        for (let color of Array.from(backgroundColors.values())) {
-            let filterName = this.filterNameFromColor(color);
-            filters.push(<filter x="0" y="0" width="1" height="1" id={filterName} key={filterName}>
-                <feFlood floodColor={color} />
-                <feComposite in="SourceGraphic" />
-            </filter>);
-        }
         let xTranslation = xOffset + (isUndefined(this.props.x) ? 0 : this.props.x);
         let yTranslation = yOffset + (isUndefined(this.props.y) ? 0 : this.props.y);
         return <svg width={this.props.width} height={this.props.height} onClick={this.rootClick}>
             <g className="usStateG" transform={`scale(${scale} ${scale}) translate(${xTranslation}, ${yTranslation})`} onClick={this.rootClick}>
-                <defs>
-                    {filters}
-                </defs>
                 {paths}
             </g>
         </svg>;
