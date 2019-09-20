@@ -46,15 +46,15 @@ export class App extends Component<{}, AppState> {
         for (let year = MIN_YEAR; year <= MAX_YEAR; ++year) {
             let data = new Map<string, string | ColorGradient>();
             for (let i = 0; i < stateCodes.length; ++i) {
-                let stateCode = stateCodes[i];
+                const stateCode = stateCodes[i];
+                const mainColor = this._colors[(i + year) % this._colors.length];
                 // Make a few states use gradients
                 if (stateCode === "CA" || stateCode === "TX") {
-                    let mainColor = this._colors[(i + year) % this._colors.length];
-                    let secondaryColor = this._colors[this._colors.length - 1];
+                    const secondaryColor = this._colors[this._colors.length - 1];
                     data.set(stateCode, new ColorGradient(mainColor, secondaryColor, GradientDirection.Right, 0.4));
                 }
                 else {
-                    data.set(stateCode, this._colors[(i + year) % this._colors.length]);
+                    data.set(stateCode, mainColor);
                 }
             }
 
