@@ -9,9 +9,10 @@ The main components are:
 
 ## USStateMap
 The main map component.  It has props:
-  - `stateColors: Map<string, string>`
+  - `stateColors: Map<string, string | ColorGradient>`
      Map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to what color it should be.
      Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
+     Instead of a string, you can specify a ColorGradient.
   - `stateTitles?: Map<string, string>`
      Optional map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to the label on the tooltip.
   - `stateSelectedCallback?: (stateCode: string) => void`
