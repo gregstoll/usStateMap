@@ -22,22 +22,52 @@ export enum GradientDirection {
 // gradient.addColorStop(0.0, color);
 // gradient.addColorStop(0.4, color);
 // gradient.addColorStop(1.0, "rgb(20, 118, 255)");
-export interface ColorGradient {
+export class ColorGradient {
     /**
      * The "main" color of the state, used to calculate what color text to use
      * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
      * */
-    mainColor: string,
+    public readonly mainColor: string;
     /**
      * The other color of the state.
      * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
      */
-    secondaryColor: string
+    public readonly secondaryColor: string;
     /**
      * The direction for the gradient to go in.
-     * For eample, Up means the mainColor will be at the bottom and the secondaryColor will be at the top.
+     * For example, Up means the mainColor will be at the bottom and the secondaryColor will be at the top.
      */
-    direction: GradientDirection
+    public readonly direction: GradientDirection;
+    /**
+     * Optional parameter 
+     */
+    public readonly mainColorStop: number;
+    public readonly secondaryColorStop: number;
+
+    constructor(mainColor: string, secondaryColor: string, direction: GradientDirection, mainColorStop?: number, secondaryColorStop?: number) {
+        this.mainColor = mainColor;
+        this.secondaryColor = secondaryColor;
+        this.direction = direction;
+        if (mainColorStop === undefined) {
+            this.mainColorStop = 0;
+        } else {
+            if (mainColorStop < 0 || mainColorStop > 1) {
+                throw `mainColorStop must be between 0-1, got ${mainColorStop}`;
+            }
+            this.mainColorStop = mainColorStop;
+        }
+        if (secondaryColorStop === undefined) {
+            this.secondaryColorStop = 1;
+        } else {
+            if (secondaryColorStop < 0 || secondaryColorStop > 1) {
+                throw `secondaryColorStop must be between 0-1, got ${secondaryColorStop}`;
+            }
+            if (secondaryColorStop < mainColorStop) {
+                throw `secondaryColorStop (${secondaryColorStop}) must be greater than or equal to mainColorStop (${mainColorStop})`
+            }
+            this.secondaryColorStop = secondaryColorStop;
+        }
+    }
 }
 
 interface USStateMapProps {
@@ -319,6 +349,43 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         return polys as Array<Array<[number, number]>>;
     }
 
+    makeSVGGradient(gradient: ColorGradient) : JSX.Element {
+        function colorStopToPercentageText(colorStop: number) {
+            return `${Math.round(colorStop * 100)}%`;
+        }
+        let gradientName = this.gradientNameFromColorGradient(gradient);
+        let x1 = 0;
+        let x2 = 0;
+        let y1 = 0;
+        let y2 = 0;
+        switch (gradient.direction) {
+            case GradientDirection.Up:
+                y1 = 1;
+                break;
+            case GradientDirection.Down:
+                y2 = 1;
+                break;
+            case GradientDirection.Left:
+                x1 = 1;
+                break;
+            case GradientDirection.Right:
+                x2 = 1;
+                break;
+        }
+        let stops : React.SVGProps<SVGStopElement>[] = [];
+        stops.push(<stop offset="0%" stopColor={gradient.mainColor} key="main"/>);
+        if (gradient.mainColorStop > 0) {
+            stops.push(<stop offset={colorStopToPercentageText(gradient.mainColorStop)} stopColor={gradient.mainColor} key="main2"/>);
+        }
+        if (gradient.secondaryColorStop < 1) {
+            stops.push(<stop offset={colorStopToPercentageText(gradient.secondaryColorStop)} stopColor={gradient.secondaryColor} key="secondary2"/>);
+        }
+        stops.push(<stop offset="100%" stopColor={gradient.secondaryColor} key="secondary"/>);
+        return (<linearGradient x1={x1} x2={x2} y1={y1} y2={y2} id={gradientName} key={gradientName}>
+            {stops}
+        </linearGradient>);
+    }
+
     render() {
         if (isNullOrUndefined(this.state.drawingInfo)) {
             return <div>Loading...</div>;
@@ -384,12 +451,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         });
         let gradientElements: JSX.Element[] = [];
         for (let gradient of Array.from(gradients.values())) {
-            let gradientName = this.gradientNameFromColorGradient(gradient);
-            //TODO use direction
-            gradientElements.push(<linearGradient x1="0" x2="1" y1="0" y2="0" id={gradientName} key={gradientName}>
-                <stop offset="0%" stopColor={gradient.mainColor}/>
-                <stop offset="100%" stopColor={gradient.secondaryColor}/>
-            </linearGradient>);
+            gradientElements.push(this.makeSVGGradient(gradient));
         }
         let xTranslation = xOffset + (isUndefined(this.props.x) ? 0 : this.props.x);
         let yTranslation = yOffset + (isUndefined(this.props.y) ? 0 : this.props.y);

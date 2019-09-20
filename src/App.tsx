@@ -51,7 +51,7 @@ export class App extends Component<{}, AppState> {
                 if (stateCode === "CA" || stateCode === "TX") {
                     let mainColor = this._colors[(i + year) % this._colors.length];
                     let secondaryColor = this._colors[this._colors.length - 1];
-                    data.set(stateCode, {mainColor: mainColor, secondaryColor: secondaryColor, direction: GradientDirection.Right });
+                    data.set(stateCode, new ColorGradient(mainColor, secondaryColor, GradientDirection.Right, 0.4));
                 }
                 else {
                     data.set(stateCode, this._colors[(i + year) % this._colors.length]);
