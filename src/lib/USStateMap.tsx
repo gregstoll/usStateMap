@@ -11,12 +11,82 @@ let parseColor = require('parse-color');
 
 import './USStateMap.css';
 
+export enum GradientDirection {
+    Up,
+    Down,
+    Left,
+    Right
+}
+
+export class ColorGradient {
+    /**
+     * The "main" color of the state, used to calculate what color text to use
+     * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
+     * */
+    public readonly mainColor: string;
+    /**
+     * The other color of the state.
+     * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
+     */
+    public readonly secondaryColor: string;
+    /**
+     * The direction for the gradient to go in.
+     * For example, Up means the mainColor will be at the bottom and the secondaryColor will be at the top.
+     */
+    public readonly direction: GradientDirection;
+    /**
+     * Optional parameter between 0-1 indicating how far through the gradient the main color should go
+     * Defaults to 0.  Must be less than or equal to secondaryColorStop.
+     * For example, setting this to 0.4 and secondaryColorStop to 0.7 will do the equivalent of:
+     * gradient.addColorStop(0.0, mainColor);
+     * gradient.addColorStop(0.4, mainColor);
+     * gradient.addColorStop(0.7, secondaryColor);
+     * gradient.addColorStop(1.0, secondaryColor);
+     */
+    public readonly mainColorStop: number;
+    /**
+     * Optional parameter between 0-1 indicating how far through the gradient the secondary color should go
+     * Defaults to 1.  Must be greater than or equal to mainColorStop.
+     * For example, setting this to 0.7 and mainColorStop to 0.4 will do the equivalent of:
+     * gradient.addColorStop(0.0, mainColor);
+     * gradient.addColorStop(0.4, mainColor);
+     * gradient.addColorStop(0.7, secondaryColor);
+     * gradient.addColorStop(1.0, secondaryColor);
+     */
+    public readonly secondaryColorStop: number;
+
+    constructor(mainColor: string, secondaryColor: string, direction: GradientDirection, mainColorStop?: number, secondaryColorStop?: number) {
+        this.mainColor = mainColor;
+        this.secondaryColor = secondaryColor;
+        this.direction = direction;
+        if (mainColorStop === undefined) {
+            this.mainColorStop = 0;
+        } else {
+            if (mainColorStop < 0 || mainColorStop > 1) {
+                throw `mainColorStop must be between 0-1, got ${mainColorStop}`;
+            }
+            this.mainColorStop = mainColorStop;
+        }
+        if (secondaryColorStop === undefined) {
+            this.secondaryColorStop = 1;
+        } else {
+            if (secondaryColorStop < 0 || secondaryColorStop > 1) {
+                throw `secondaryColorStop must be between 0-1, got ${secondaryColorStop}`;
+            }
+            if (secondaryColorStop < mainColorStop) {
+                throw `secondaryColorStop (${secondaryColorStop}) must be greater than or equal to mainColorStop (${mainColorStop})`
+            }
+            this.secondaryColorStop = secondaryColorStop;
+        }
+    }
+}
+
 interface USStateMapProps {
     /**
      * Map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to what color it should be.
      * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
      * */
-    stateColors: Map<string, string>,
+    stateColors: Map<string, string | ColorGradient>,
     /**
      * Optional map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to the label on the tooltip.
      * */
@@ -200,7 +270,11 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         }
     }
 
-    getSVGPaths = (stateCode: string, stateName: string, path: string, backgroundColors: Set<string>): Array<JSX.Element> => {
+    isColorGradient(color: string | ColorGradient): color is ColorGradient {
+        return (color as ColorGradient).direction !== undefined;
+    }
+
+    getSVGPaths = (stateCode: string, stateName: string, path: string, gradients: Set<ColorGradient>): Array<JSX.Element> => {
         if (isNullOrUndefined(path)) {
             return [];
         }
@@ -210,31 +284,41 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         const title = isNullOrUndefined(titleExtra) ? stateName : `${stateName}: ${titleExtra}`;
         let textPosition: [number, number];
         let parts = [];
-        let filterText = "";
+        const primaryColor = this.isColorGradient(color) ? color.mainColor : color;
+        if (this.isColorGradient(color)) {
+            gradients.add(color);
+        }
+        const cssColor = this.isColorGradient(color) ? `url(#${this.gradientNameFromColorGradient(color)})` : color;
         // only use labelLines in non-cartogram mode - state codes fit inside all the states in cartogram mode
         if (!this.props.isCartogram && this.labelLines.has(stateCode)) {
             const labelLineInfo = this.labelLines.get(stateCode);
             textPosition = labelLineInfo.lineTextPosition;
             const linePath = `M ${labelLineInfo.lineStart[0]},${labelLineInfo.lineStart[1]} L ${labelLineInfo.lineEnd[0]},${labelLineInfo.lineEnd[1]} Z`;
             parts.push(<path key={stateCode + "line"} name={stateCode + "line"} d={linePath} className="labelLine"/>);
-            backgroundColors.add(color);
-            let filterName = this.filterNameFromColor(color);
-            filterText = `url(#${filterName})`;
         }
         else {
             textPosition = this.getCenter(parsedPath);
         }
-        parts.push(<path className="usState" name={stateCode} d={path} style={{ fill: color }} key={stateCode} onClick={this.stateClick}>
+        parts.push(<path className="usState" name={stateCode} d={path} style={{ fill: cssColor }} key={stateCode} onClick={this.stateClick}>
             <title>{title}</title>
         </path>);
+        if (!this.props.isCartogram && this.labelLines.has(stateCode)) {
+            // https://stackoverflow.com/a/41902064/118417
+            // This is a somewhat hacky but easy way to get a background for an SVG text element.
+            // Note that we use "HH" since we know all of these state codes are two characters, and
+            // "H" doesn't cause any weird edges. (try "XX" or "VV" to see the weirdness)
+            parts.push(<text className="usStateText" name={stateCode} x={textPosition[0]} y={textPosition[1]} key={stateCode + "textBackground"}
+                dy="0.25em" onClick={this.stateClick} stroke={cssColor} strokeWidth="0.6em"><title>{title}</title>HH</text>);
+        }
         parts.push(<text className="usStateText" name={stateCode} x={textPosition[0]} y={textPosition[1]} key={stateCode + "text"}
-            dy="0.25em" onClick={this.stateClick} stroke={this.getLabelColor(color)} filter={filterText}><title>{title}</title>{stateCode}</text>);
+            dy="0.25em" onClick={this.stateClick} stroke={this.getLabelColor(primaryColor)}><title>{title}</title>{stateCode}</text>);
         return parts;
     };
 
-    filterNameFromColor(color: string): string {
-        let parsedColor = parseColor(color);
-        return "color" + (parsedColor.hex as string).substr(1);
+    gradientNameFromColorGradient(gradient: ColorGradient): string {
+        const mainParsedColor = parseColor(gradient.mainColor);
+        const secondaryParsedColor = parseColor(gradient.secondaryColor);
+        return "gradient" + (mainParsedColor.hex as string).substr(1) + (secondaryParsedColor.hex as string).substr(1) + gradient.direction;
     }
 
     getLabelColor(backgroundColor: string): string {
@@ -276,6 +360,43 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         return polys as Array<Array<[number, number]>>;
     }
 
+    makeSVGGradient(gradient: ColorGradient) : JSX.Element {
+        function colorStopToPercentageText(colorStop: number) {
+            return `${Math.round(colorStop * 100)}%`;
+        }
+        let gradientName = this.gradientNameFromColorGradient(gradient);
+        let x1 = 0;
+        let x2 = 0;
+        let y1 = 0;
+        let y2 = 0;
+        switch (gradient.direction) {
+            case GradientDirection.Up:
+                y1 = 1;
+                break;
+            case GradientDirection.Down:
+                y2 = 1;
+                break;
+            case GradientDirection.Left:
+                x1 = 1;
+                break;
+            case GradientDirection.Right:
+                x2 = 1;
+                break;
+        }
+        let stops : React.SVGProps<SVGStopElement>[] = [];
+        stops.push(<stop offset="0%" stopColor={gradient.mainColor} key="main"/>);
+        if (gradient.mainColorStop > 0) {
+            stops.push(<stop offset={colorStopToPercentageText(gradient.mainColorStop)} stopColor={gradient.mainColor} key="main2"/>);
+        }
+        if (gradient.secondaryColorStop < 1) {
+            stops.push(<stop offset={colorStopToPercentageText(gradient.secondaryColorStop)} stopColor={gradient.secondaryColor} key="secondary2"/>);
+        }
+        stops.push(<stop offset="100%" stopColor={gradient.secondaryColor} key="secondary"/>);
+        return (<linearGradient x1={x1} x2={x2} y1={y1} y2={y2} id={gradientName} key={gradientName}>
+            {stops}
+        </linearGradient>);
+    }
+
     render() {
         if (isNullOrUndefined(this.state.drawingInfo)) {
             return <div>Loading...</div>;
@@ -283,7 +404,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         // https://d3-geomap.github.io/map/choropleth/us-states/
         //const map = d3.geomap.choropleth().geofile('/d3-geomap/topojson/countries/USA.json').projection(this.projection);
         let paths: JSX.Element[] = [];
-        let backgroundColors = new Set<string>();
+        let gradients = new Set<ColorGradient>();
         let scale = 1, xOffset = 0, yOffset = 0;
         if (!this.props.isCartogram) {
             const us = this.state.drawingInfo.usTopoJson;
@@ -295,7 +416,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
                 let stateId = topoState.id;
                 let stateNameObj = this.state.drawingInfo.stateInfos.idToStateName.get(stateId);
                 let stateCode = stateNameObj.code;
-                for (let path of this.getSVGPaths(stateCode, stateNameObj.name, this.geoPath(topojson.feature(us, topoState)), backgroundColors)) {
+                for (let path of this.getSVGPaths(stateCode, stateNameObj.name, this.geoPath(topojson.feature(us, topoState)), gradients)) {
                     paths.push(path);
                 }
             }
@@ -307,7 +428,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
                 let stateCode = thisPath.getAttribute("id");
                 let stateNameObj = that.state.drawingInfo.stateInfos.codeToStateName.get(stateCode);
                 let pathString = thisPath.getAttribute("d");
-                for (let path of that.getSVGPaths(stateCode, stateNameObj.name, pathString, backgroundColors)) {
+                for (let path of that.getSVGPaths(stateCode, stateNameObj.name, pathString, gradients)) {
                     paths.push(path);
                 }
             });
@@ -339,20 +460,16 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
             }
             return 0;
         });
-        let filters: JSX.Element[] = [];
-        for (let color of Array.from(backgroundColors.values())) {
-            let filterName = this.filterNameFromColor(color);
-            filters.push(<filter x="0" y="0" width="1" height="1" id={filterName} key={filterName}>
-                <feFlood floodColor={color} />
-                <feComposite in="SourceGraphic" />
-            </filter>);
+        let gradientElements: JSX.Element[] = [];
+        for (let gradient of Array.from(gradients.values())) {
+            gradientElements.push(this.makeSVGGradient(gradient));
         }
         let xTranslation = xOffset + (isUndefined(this.props.x) ? 0 : this.props.x);
         let yTranslation = yOffset + (isUndefined(this.props.y) ? 0 : this.props.y);
         return <svg width={this.props.width} height={this.props.height} onClick={this.rootClick}>
             <g className="usStateG" transform={`scale(${scale} ${scale}) translate(${xTranslation}, ${yTranslation})`} onClick={this.rootClick}>
                 <defs>
-                    {filters}
+                    {gradientElements}
                 </defs>
                 {paths}
             </g>

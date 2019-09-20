@@ -3,12 +3,13 @@ import { USStateMap, DateSlider, TickDateRange } from './lib';
 import { Button } from 'semantic-ui-react';
 import 'rc-slider/assets/index.css';
 import 'semantic-ui-css/semantic.min.css';
+import { ColorGradient, GradientDirection } from './lib/USStateMap';
 
 interface AppState {
     year: number,
     stateSelected: string,
     isCartogram: boolean,
-    fakeStateColors: Map<number, Map<string, string>>
+    fakeStateColors: Map<number, Map<string, string | ColorGradient>>
 }
 
 const MIN_YEAR = 2010;
@@ -40,13 +41,21 @@ export class App extends Component<{}, AppState> {
 
     componentDidMount = () => {
         // You probably want to load some data here, we'll just make something up.
-        let tempFakeStateColors = new Map<number, Map<string, string>>();
+        let tempFakeStateColors = new Map<number, Map<string, string | ColorGradient>>();
         const stateCodes: Array<string> = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'];
         for (let year = MIN_YEAR; year <= MAX_YEAR; ++year) {
-            let data = new Map<string, string>();
+            let data = new Map<string, string | ColorGradient>();
             for (let i = 0; i < stateCodes.length; ++i) {
-                let stateCode = stateCodes[i];
-                data.set(stateCode, this._colors[(i + year) % this._colors.length]);
+                const stateCode = stateCodes[i];
+                const mainColor = this._colors[(i + year) % this._colors.length];
+                // Make a few states use gradients
+                if (stateCode === "CA" || stateCode === "TX") {
+                    const secondaryColor = this._colors[this._colors.length - 1];
+                    data.set(stateCode, new ColorGradient(mainColor, secondaryColor, GradientDirection.Right, 0.4));
+                }
+                else {
+                    data.set(stateCode, mainColor);
+                }
             }
 
             tempFakeStateColors.set(year, data);
