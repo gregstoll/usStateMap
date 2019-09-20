@@ -59,6 +59,43 @@ var util_1 = require("util");
 var polylabel = require('polylabel');
 var parseColor = require('parse-color');
 require("./USStateMap.css");
+var GradientDirection;
+(function (GradientDirection) {
+    GradientDirection[GradientDirection["Up"] = 0] = "Up";
+    GradientDirection[GradientDirection["Down"] = 1] = "Down";
+    GradientDirection[GradientDirection["Left"] = 2] = "Left";
+    GradientDirection[GradientDirection["Right"] = 3] = "Right";
+})(GradientDirection = exports.GradientDirection || (exports.GradientDirection = {}));
+var ColorGradient = /** @class */ (function () {
+    function ColorGradient(mainColor, secondaryColor, direction, mainColorStop, secondaryColorStop) {
+        this.mainColor = mainColor;
+        this.secondaryColor = secondaryColor;
+        this.direction = direction;
+        if (mainColorStop === undefined) {
+            this.mainColorStop = 0;
+        }
+        else {
+            if (mainColorStop < 0 || mainColorStop > 1) {
+                throw "mainColorStop must be between 0-1, got " + mainColorStop;
+            }
+            this.mainColorStop = mainColorStop;
+        }
+        if (secondaryColorStop === undefined) {
+            this.secondaryColorStop = 1;
+        }
+        else {
+            if (secondaryColorStop < 0 || secondaryColorStop > 1) {
+                throw "secondaryColorStop must be between 0-1, got " + secondaryColorStop;
+            }
+            if (secondaryColorStop < mainColorStop) {
+                throw "secondaryColorStop (" + secondaryColorStop + ") must be greater than or equal to mainColorStop (" + mainColorStop + ")";
+            }
+            this.secondaryColorStop = secondaryColorStop;
+        }
+    }
+    return ColorGradient;
+}());
+exports.ColorGradient = ColorGradient;
 ;
 ;
 ;
@@ -88,7 +125,7 @@ var USStateMap = /** @class */ (function (_super) {
                 }
             }
         };
-        _this.getSVGPaths = function (stateCode, stateName, path, backgroundColors) {
+        _this.getSVGPaths = function (stateCode, stateName, path, gradients) {
             if (util_1.isNullOrUndefined(path)) {
                 return [];
             }
@@ -98,23 +135,33 @@ var USStateMap = /** @class */ (function (_super) {
             var title = util_1.isNullOrUndefined(titleExtra) ? stateName : stateName + ": " + titleExtra;
             var textPosition;
             var parts = [];
-            var filterText = "";
+            var primaryColor = _this.isColorGradient(color) ? color.mainColor : color;
+            if (_this.isColorGradient(color)) {
+                gradients.add(color);
+            }
+            var cssColor = _this.isColorGradient(color) ? "url(#" + _this.gradientNameFromColorGradient(color) + ")" : color;
             // only use labelLines in non-cartogram mode - state codes fit inside all the states in cartogram mode
             if (!_this.props.isCartogram && _this.labelLines.has(stateCode)) {
                 var labelLineInfo = _this.labelLines.get(stateCode);
                 textPosition = labelLineInfo.lineTextPosition;
                 var linePath = "M " + labelLineInfo.lineStart[0] + "," + labelLineInfo.lineStart[1] + " L " + labelLineInfo.lineEnd[0] + "," + labelLineInfo.lineEnd[1] + " Z";
                 parts.push(React.createElement("path", { key: stateCode + "line", name: stateCode + "line", d: linePath, className: "labelLine" }));
-                backgroundColors.add(color);
-                var filterName = _this.filterNameFromColor(color);
-                filterText = "url(#" + filterName + ")";
             }
             else {
                 textPosition = _this.getCenter(parsedPath);
             }
-            parts.push(React.createElement("path", { className: "usState", name: stateCode, d: path, style: { fill: color }, key: stateCode, onClick: _this.stateClick },
+            parts.push(React.createElement("path", { className: "usState", name: stateCode, d: path, style: { fill: cssColor }, key: stateCode, onClick: _this.stateClick },
                 React.createElement("title", null, title)));
-            parts.push(React.createElement("text", { className: "usStateText", name: stateCode, x: textPosition[0], y: textPosition[1], key: stateCode + "text", dy: "0.25em", onClick: _this.stateClick, stroke: _this.getLabelColor(color), filter: filterText },
+            if (!_this.props.isCartogram && _this.labelLines.has(stateCode)) {
+                // https://stackoverflow.com/a/41902064/118417
+                // This is a somewhat hacky but easy way to get a background for an SVG text element.
+                // Note that we use "HH" since we know all of these state codes are two characters, and
+                // "H" doesn't cause any weird edges. (try "XX" or "VV" to see the weirdness)
+                parts.push(React.createElement("text", { className: "usStateText", name: stateCode, x: textPosition[0], y: textPosition[1], key: stateCode + "textBackground", dy: "0.25em", onClick: _this.stateClick, stroke: cssColor, strokeWidth: "0.6em" },
+                    React.createElement("title", null, title),
+                    "HH"));
+            }
+            parts.push(React.createElement("text", { className: "usStateText", name: stateCode, x: textPosition[0], y: textPosition[1], key: stateCode + "text", dy: "0.25em", onClick: _this.stateClick, stroke: _this.getLabelColor(primaryColor) },
                 React.createElement("title", null, title),
                 stateCode));
             return parts;
@@ -236,9 +283,13 @@ var USStateMap = /** @class */ (function (_super) {
             .translate([actualDimension / 2, actualDimension / 2])
             .scale(actualDimension * 1.0);
     };
-    USStateMap.prototype.filterNameFromColor = function (color) {
-        var parsedColor = parseColor(color);
-        return "color" + parsedColor.hex.substr(1);
+    USStateMap.prototype.isColorGradient = function (color) {
+        return color.direction !== undefined;
+    };
+    USStateMap.prototype.gradientNameFromColorGradient = function (gradient) {
+        var mainParsedColor = parseColor(gradient.mainColor);
+        var secondaryParsedColor = parseColor(gradient.secondaryColor);
+        return "gradient" + mainParsedColor.hex.substr(1) + secondaryParsedColor.hex.substr(1) + gradient.direction;
     };
     USStateMap.prototype.getLabelColor = function (backgroundColor) {
         var backgroundParsedColor = parseColor(backgroundColor);
@@ -277,6 +328,40 @@ var USStateMap = /** @class */ (function (_super) {
         });
         return polys;
     };
+    USStateMap.prototype.makeSVGGradient = function (gradient) {
+        function colorStopToPercentageText(colorStop) {
+            return Math.round(colorStop * 100) + "%";
+        }
+        var gradientName = this.gradientNameFromColorGradient(gradient);
+        var x1 = 0;
+        var x2 = 0;
+        var y1 = 0;
+        var y2 = 0;
+        switch (gradient.direction) {
+            case GradientDirection.Up:
+                y1 = 1;
+                break;
+            case GradientDirection.Down:
+                y2 = 1;
+                break;
+            case GradientDirection.Left:
+                x1 = 1;
+                break;
+            case GradientDirection.Right:
+                x2 = 1;
+                break;
+        }
+        var stops = [];
+        stops.push(React.createElement("stop", { offset: "0%", stopColor: gradient.mainColor, key: "main" }));
+        if (gradient.mainColorStop > 0) {
+            stops.push(React.createElement("stop", { offset: colorStopToPercentageText(gradient.mainColorStop), stopColor: gradient.mainColor, key: "main2" }));
+        }
+        if (gradient.secondaryColorStop < 1) {
+            stops.push(React.createElement("stop", { offset: colorStopToPercentageText(gradient.secondaryColorStop), stopColor: gradient.secondaryColor, key: "secondary2" }));
+        }
+        stops.push(React.createElement("stop", { offset: "100%", stopColor: gradient.secondaryColor, key: "secondary" }));
+        return (React.createElement("linearGradient", { x1: x1, x2: x2, y1: y1, y2: y2, id: gradientName, key: gradientName }, stops));
+    };
     USStateMap.prototype.render = function () {
         if (util_1.isNullOrUndefined(this.state.drawingInfo)) {
             return React.createElement("div", null, "Loading...");
@@ -284,7 +369,7 @@ var USStateMap = /** @class */ (function (_super) {
         // https://d3-geomap.github.io/map/choropleth/us-states/
         //const map = d3.geomap.choropleth().geofile('/d3-geomap/topojson/countries/USA.json').projection(this.projection);
         var paths = [];
-        var backgroundColors = new Set();
+        var gradients = new Set();
         var scale = 1, xOffset = 0, yOffset = 0;
         if (!this.props.isCartogram) {
             var us = this.state.drawingInfo.usTopoJson;
@@ -296,7 +381,7 @@ var USStateMap = /** @class */ (function (_super) {
                 var stateId = topoState.id;
                 var stateNameObj = this.state.drawingInfo.stateInfos.idToStateName.get(stateId);
                 var stateCode = stateNameObj.code;
-                for (var _i = 0, _a = this.getSVGPaths(stateCode, stateNameObj.name, this.geoPath(topojson.feature(us, topoState)), backgroundColors); _i < _a.length; _i++) {
+                for (var _i = 0, _a = this.getSVGPaths(stateCode, stateNameObj.name, this.geoPath(topojson.feature(us, topoState)), gradients); _i < _a.length; _i++) {
                     var path = _a[_i];
                     paths.push(path);
                 }
@@ -309,7 +394,7 @@ var USStateMap = /** @class */ (function (_super) {
                 var stateCode = thisPath.getAttribute("id");
                 var stateNameObj = that_1.state.drawingInfo.stateInfos.codeToStateName.get(stateCode);
                 var pathString = thisPath.getAttribute("d");
-                for (var _i = 0, _a = that_1.getSVGPaths(stateCode, stateNameObj.name, pathString, backgroundColors); _i < _a.length; _i++) {
+                for (var _i = 0, _a = that_1.getSVGPaths(stateCode, stateNameObj.name, pathString, gradients); _i < _a.length; _i++) {
                     var path = _a[_i];
                     paths.push(path);
                 }
@@ -342,19 +427,16 @@ var USStateMap = /** @class */ (function (_super) {
             }
             return 0;
         });
-        var filters = [];
-        for (var _b = 0, _c = Array.from(backgroundColors.values()); _b < _c.length; _b++) {
-            var color = _c[_b];
-            var filterName = this.filterNameFromColor(color);
-            filters.push(React.createElement("filter", { x: "0", y: "0", width: "1", height: "1", id: filterName, key: filterName },
-                React.createElement("feFlood", { floodColor: color }),
-                React.createElement("feComposite", { "in": "SourceGraphic" })));
+        var gradientElements = [];
+        for (var _b = 0, _c = Array.from(gradients.values()); _b < _c.length; _b++) {
+            var gradient = _c[_b];
+            gradientElements.push(this.makeSVGGradient(gradient));
         }
         var xTranslation = xOffset + (util_1.isUndefined(this.props.x) ? 0 : this.props.x);
         var yTranslation = yOffset + (util_1.isUndefined(this.props.y) ? 0 : this.props.y);
         return React.createElement("svg", { width: this.props.width, height: this.props.height, onClick: this.rootClick },
             React.createElement("g", { className: "usStateG", transform: "scale(" + scale + " " + scale + ") translate(" + xTranslation + ", " + yTranslation + ")", onClick: this.rootClick },
-                React.createElement("defs", null, filters),
+                React.createElement("defs", null, gradientElements),
                 paths));
     };
     return USStateMap;

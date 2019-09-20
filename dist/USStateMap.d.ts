@@ -3,12 +3,56 @@ import * as React from 'react';
 import * as d3 from 'd3';
 import { StateInfos } from './DataHandling';
 import './USStateMap.css';
+export declare enum GradientDirection {
+    Up = 0,
+    Down = 1,
+    Left = 2,
+    Right = 3
+}
+export declare class ColorGradient {
+    /**
+     * The "main" color of the state, used to calculate what color text to use
+     * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
+     * */
+    readonly mainColor: string;
+    /**
+     * The other color of the state.
+     * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
+     */
+    readonly secondaryColor: string;
+    /**
+     * The direction for the gradient to go in.
+     * For example, Up means the mainColor will be at the bottom and the secondaryColor will be at the top.
+     */
+    readonly direction: GradientDirection;
+    /**
+     * Optional parameter between 0-1 indicating how far through the gradient the main color should go
+     * Defaults to 0.  Must be less than or equal to secondaryColorStop.
+     * For example, setting this to 0.4 and secondaryColorStop to 0.7 will do the equivalent of:
+     * gradient.addColorStop(0.0, mainColor);
+     * gradient.addColorStop(0.4, mainColor);
+     * gradient.addColorStop(0.7, secondaryColor);
+     * gradient.addColorStop(1.0, secondaryColor);
+     */
+    readonly mainColorStop: number;
+    /**
+     * Optional parameter between 0-1 indicating how far through the gradient the secondary color should go
+     * Defaults to 1.  Must be greater than or equal to mainColorStop.
+     * For example, setting this to 0.7 and mainColorStop to 0.4 will do the equivalent of:
+     * gradient.addColorStop(0.0, mainColor);
+     * gradient.addColorStop(0.4, mainColor);
+     * gradient.addColorStop(0.7, secondaryColor);
+     * gradient.addColorStop(1.0, secondaryColor);
+     */
+    readonly secondaryColorStop: number;
+    constructor(mainColor: string, secondaryColor: string, direction: GradientDirection, mainColorStop?: number, secondaryColorStop?: number);
+}
 interface USStateMapProps {
     /**
      * Map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to what color it should be.
      * Any CSS color should work (examples: 'red', '#123456', 'rgb(100, 200, 0)', etc.)
      * */
-    stateColors: Map<string, string>;
+    stateColors: Map<string, string | ColorGradient>;
     /**
      * Optional map of stateCode (i.e. 'AL', 'DC', 'TX', etc.) to the label on the tooltip.
      * */
@@ -74,11 +118,13 @@ export declare class USStateMap extends Component<USStateMapProps, USStateMapSta
     updateD3(props: any): void;
     stateClick: (event: React.MouseEvent<SVGElement, MouseEvent>) => void;
     rootClick: (event: React.MouseEvent<SVGGElement, MouseEvent>) => void;
-    getSVGPaths: (stateCode: string, stateName: string, path: string, backgroundColors: Set<string>) => JSX.Element[];
-    filterNameFromColor(color: string): string;
+    isColorGradient(color: string | ColorGradient): color is ColorGradient;
+    getSVGPaths: (stateCode: string, stateName: string, path: string, gradients: Set<ColorGradient>) => JSX.Element[];
+    gradientNameFromColorGradient(gradient: ColorGradient): string;
     getLabelColor(backgroundColor: string): string;
     getCenter(shapes: Array<Array<[number, number]>>): [number, number];
     parsePath(str: string): Array<Array<[number, number]>>;
+    makeSVGGradient(gradient: ColorGradient): JSX.Element;
     render(): JSX.Element;
 }
 export {};
