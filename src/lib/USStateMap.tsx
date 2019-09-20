@@ -18,10 +18,6 @@ export enum GradientDirection {
     Right
 }
 
-// TODO more fully featured, like
-// gradient.addColorStop(0.0, color);
-// gradient.addColorStop(0.4, color);
-// gradient.addColorStop(1.0, "rgb(20, 118, 255)");
 export class ColorGradient {
     /**
      * The "main" color of the state, used to calculate what color text to use
@@ -39,9 +35,24 @@ export class ColorGradient {
      */
     public readonly direction: GradientDirection;
     /**
-     * Optional parameter 
+     * Optional parameter between 0-1 indicating how far through the gradient the main color should go
+     * Defaults to 0.  Must be less than or equal to secondaryColorStop.
+     * For example, setting this to 0.4 and secondaryColorStop to 0.7 will do the equivalent of:
+     * gradient.addColorStop(0.0, mainColor);
+     * gradient.addColorStop(0.4, mainColor);
+     * gradient.addColorStop(0.7, secondaryColor);
+     * gradient.addColorStop(1.0, secondaryColor);
      */
     public readonly mainColorStop: number;
+    /**
+     * Optional parameter between 0-1 indicating how far through the gradient the secondary color should go
+     * Defaults to 1.  Must be greater than or equal to mainColorStop.
+     * For example, setting this to 0.7 and mainColorStop to 0.4 will do the equivalent of:
+     * gradient.addColorStop(0.0, mainColor);
+     * gradient.addColorStop(0.4, mainColor);
+     * gradient.addColorStop(0.7, secondaryColor);
+     * gradient.addColorStop(1.0, secondaryColor);
+     */
     public readonly secondaryColorStop: number;
 
     constructor(mainColor: string, secondaryColor: string, direction: GradientDirection, mainColorStop?: number, secondaryColorStop?: number) {
