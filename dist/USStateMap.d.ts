@@ -116,10 +116,10 @@ export declare class USStateMap extends Component<USStateMapProps, USStateMapSta
     private getCartogramAsync;
     initLabelLines(): void;
     updateD3(props: any): void;
-    stateClick: (event: React.MouseEvent<SVGElement, MouseEvent>) => void;
-    rootClick: (event: React.MouseEvent<SVGGElement, MouseEvent>) => void;
+    stateClick: (event: React.MouseEvent<SVGElement>) => void;
+    rootClick: (event: React.MouseEvent<SVGGElement>) => void;
     isColorGradient(color: string | ColorGradient): color is ColorGradient;
-    getSVGPaths: (stateCode: string, stateName: string, path: string, gradients: Set<ColorGradient>) => JSX.Element[];
+    getSVGPaths: (stateCode: string, stateName: string, path: string, gradients: Set<ColorGradient>) => Array<JSX.Element>;
     gradientNameFromColorGradient(gradient: ColorGradient): string;
     getLabelColor(backgroundColor: string): string;
     getCenter(shapes: Array<Array<[number, number]>>): [number, number];

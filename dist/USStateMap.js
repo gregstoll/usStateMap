@@ -49,6 +49,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.USStateMap = exports.ColorGradient = exports.GradientDirection = void 0;
 var react_1 = require("react");
 var React = require("react");
 var d3 = require("d3");

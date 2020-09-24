@@ -13,6 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
+exports.DateSlider = exports.TickDateRange = exports.DateSliderSpeedEnum = void 0;
 var react_1 = require("react");
 var React = require("react");
 var semantic_ui_react_1 = require("semantic-ui-react");

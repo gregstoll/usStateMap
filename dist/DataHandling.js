@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.loadAllData = void 0;
 var d3 = require("d3");
 ;
 ;
