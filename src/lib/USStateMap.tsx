@@ -10,6 +10,13 @@ let polylabel = require('polylabel');
 let parseColor = require('parse-color');
 
 import './USStateMap.css';
+ 
+function getD3Url(path: string): string{
+    if (process.env.NODE_ENV !== "production") {
+        return process.env.PUBLIC_URL + '/' + path;
+    }
+    return path;
+}
 
 export enum GradientDirection {
     Up,
@@ -174,8 +181,8 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
 
     private async getDataAsync(): Promise<USStateMapDrawingInfo> {
         try {
-            let usPromise = d3.json('data/us.json');
-            let stateNamesPromise = d3.tsv('data/us-state-names.tsv', this.cleanStateName);
+            let usPromise = d3.json(getD3Url('data/us.json'));
+            let stateNamesPromise = d3.tsv(getD3Url('data/us-state-names.tsv'), this.cleanStateName);
             let cartogramPromise = this.getCartogramAsync();
             let us = await usPromise;
             let stateNames = await stateNamesPromise;
@@ -212,7 +219,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
 
     private async getCartogramAsync(): Promise<d3.Selection<HTMLElement, () => any, null, undefined>> {
         try {
-            const xml = await d3.xml('data/cartograms/fivethirtyeight.svg', { headers: new Headers({ "Content-Type": "image/svg+xml" }) });
+            const xml = await d3.xml(getD3Url('data/cartograms/fivethirtyeight.svg'), { headers: new Headers({ "Content-Type": "image/svg+xml" }) });
             return d3.select(xml.documentElement);
         } catch (error) {
             console.error("Error in USStateMap cartogram: " + error);

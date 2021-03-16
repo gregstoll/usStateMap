@@ -60,6 +60,12 @@ var util_1 = require("util");
 var polylabel = require('polylabel');
 var parseColor = require('parse-color');
 require("./USStateMap.css");
+function getD3Url(path) {
+    if (process.env.NODE_ENV !== "production") {
+        return process.env.PUBLIC_URL + '/' + path;
+    }
+    return path;
+}
 var GradientDirection;
 (function (GradientDirection) {
     GradientDirection[GradientDirection["Up"] = 0] = "Up";
@@ -195,8 +201,8 @@ var USStateMap = /** @class */ (function (_super) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 4, , 5]);
-                        usPromise = d3.json('data/us.json');
-                        stateNamesPromise = d3.tsv('data/us-state-names.tsv', this.cleanStateName);
+                        usPromise = d3.json(getD3Url('data/us.json'));
+                        stateNamesPromise = d3.tsv(getD3Url('data/us-state-names.tsv'), this.cleanStateName);
                         cartogramPromise = this.getCartogramAsync();
                         return [4 /*yield*/, usPromise];
                     case 1:
@@ -247,7 +253,7 @@ var USStateMap = /** @class */ (function (_super) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, d3.xml('data/cartograms/fivethirtyeight.svg', { headers: new Headers({ "Content-Type": "image/svg+xml" }) })];
+                        return [4 /*yield*/, d3.xml(getD3Url('data/cartograms/fivethirtyeight.svg'), { headers: new Headers({ "Content-Type": "image/svg+xml" }) })];
                     case 1:
                         xml = _a.sent();
                         return [2 /*return*/, d3.select(xml.documentElement)];
