@@ -54,7 +54,7 @@ var react_1 = require("react");
 var React = require("react");
 var d3 = require("d3");
 var _ = require("lodash");
-var topojson = require("topojson");
+var topojson = require("topojson-client");
 var util_1 = require("util");
 // not sure why these are necessary this way?
 var polylabel = require('polylabel');

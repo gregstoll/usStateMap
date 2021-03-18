@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { StateName, StateInfos } from './DataHandling';
-import * as topojson from 'topojson'
+import * as topojson from 'topojson-client'
 import { isNullOrUndefined, isUndefined } from 'util';
 // not sure why these are necessary this way?
 let polylabel = require('polylabel');
