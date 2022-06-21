@@ -3,10 +3,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -43,9 +45,9 @@ var TickDateRange = /** @class */ (function () {
      */
     function TickDateRange(endYear, endMonth) {
         this.endYear = endYear;
-        var realEndMonth = util_1.isUndefined(endMonth) ? 11 : endMonth;
+        var realEndMonth = (0, util_1.isUndefined)(endMonth) ? 11 : endMonth;
         if (realEndMonth < 0 || realEndMonth > 11) {
-            throw "endMonth is out of range (must be >= 0 and < 12, got " + endMonth + ")";
+            throw "endMonth is out of range (must be >= 0 and < 12, got ".concat(endMonth, ")");
         }
         this.endMonth = realEndMonth;
     }
@@ -100,14 +102,14 @@ var DateSlider = /** @class */ (function (_super) {
             console.error("Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!");
             throw "Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!";
         }
-        _this.state = { isPlaying: false, playSpeed: util_1.isNullOrUndefined(props.initialSpeed) ? DateSliderSpeedEnum.Normal : props.initialSpeed };
+        _this.state = { isPlaying: false, playSpeed: (0, util_1.isNullOrUndefined)(props.initialSpeed) ? DateSliderSpeedEnum.Normal : props.initialSpeed };
         return _this;
     }
     /**
      * How many months the date advances per tick.
      * */
     DateSlider.prototype.monthChangePerTick = function () {
-        if (util_1.isUndefined(this.props.ticksPerYear)) {
+        if ((0, util_1.isUndefined)(this.props.ticksPerYear)) {
             return this.props.yearsPerTick * 12;
         }
         else {
@@ -143,7 +145,7 @@ var DateSlider = /** @class */ (function (_super) {
             React.createElement(semantic_ui_react_1.Button, { onClick: function () { return _this.clickStopPlayButton(); } }, this.state.isPlaying ? "Stop" : "Play"),
             "Speed: ",
             React.createElement(semantic_ui_react_1.Select, { options: DateSlider.speedOptions(), value: this.state.playSpeed, onChange: this.changeSpeed }));
-        var sliderProps = util_1.isNullOrUndefined(this.props.cssProps) ? { width: 500 } : this.props.cssProps;
+        var sliderProps = (0, util_1.isNullOrUndefined)(this.props.cssProps) ? { width: 500 } : this.props.cssProps;
         // https://react-component.github.io/slider/examples/slider.html
         return (React.createElement("div", { style: sliderProps, className: "centerFixedWidth" },
             React.createElement(rc_slider_1["default"], { min: 0, max: this.dateRangeToSliderIndex(this.props.endTickDateRange), step: 1, value: this.dateRangeToSliderIndex(this.props.currentTickDateRange), onChange: this.onSliderChange }),

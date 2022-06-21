@@ -46,7 +46,7 @@ var cleanStateName = function (d) { return ({
     name: d.name
 }); };
 ;
-exports.loadAllData = function () { return __awaiter(void 0, void 0, void 0, function () {
+var loadAllData = function () { return __awaiter(void 0, void 0, void 0, function () {
     var stateNamesPromise, stateNames;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -65,6 +65,7 @@ exports.loadAllData = function () { return __awaiter(void 0, void 0, void 0, fun
         }
     });
 }); };
+exports.loadAllData = loadAllData;
 function makeStateInfos(names) {
     var stateInfos = { codeToStateName: new Map(), idToStateName: new Map() };
     for (var _i = 0, names_1 = names; _i < names_1.length; _i++) {

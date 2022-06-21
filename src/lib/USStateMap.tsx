@@ -4,7 +4,6 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { StateName, StateInfos } from './DataHandling';
 import * as topojson from 'topojson-client'
-import { isNullOrUndefined, isUndefined } from 'util';
 // not sure why these are necessary this way?
 let polylabel = require('polylabel');
 let parseColor = require('parse-color');
@@ -262,14 +261,14 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         // event.target is the childmost thing that got clicked on
         // (event.currentTarget is the element we registered on, which is not helpful)
         let target = event.target as SVGElement;
-        if (isNullOrUndefined(target))
+        if (target === null || target === undefined)
         {
             return;
         }
         let nameAttribute: string = target.attributes["name"];
         // TODO - this is a little brittle, I guess, it assumes that the root SVG
         // thing doesn't have a name
-        if (isNullOrUndefined(nameAttribute))
+        if (nameAttribute === null || nameAttribute === undefined)
         {
             if (this.props.stateClearedCallback) {
                 this.props.stateClearedCallback();
@@ -282,13 +281,13 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
     }
 
     getSVGPaths = (stateCode: string, stateName: string, path: string, gradients: Set<ColorGradient>): Array<JSX.Element> => {
-        if (isNullOrUndefined(path)) {
+        if (path === null || path === undefined) {
             return [];
         }
         const color = (this.props.stateColors && this.props.stateColors.get(stateCode)) || 'rgb(240, 240, 240)';
         const titleExtra = this.props.stateTitles && this.props.stateTitles.get(stateCode);
         const parsedPath = this.parsePath(path);
-        const title = isNullOrUndefined(titleExtra) ? stateName : `${stateName}: ${titleExtra}`;
+        const title = (titleExtra === null || titleExtra === undefined) ? stateName : `${stateName}: ${titleExtra}`;
         let textPosition: [number, number];
         let parts = [];
         const primaryColor = this.isColorGradient(color) ? color.mainColor : color;
@@ -332,7 +331,7 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         let backgroundParsedColor = parseColor(backgroundColor);
         // Used to use HSL, but I think this is more accurate
         let rgb: number[] = backgroundParsedColor.rgb;
-        if (isNullOrUndefined(rgb)) {
+        if (rgb === null || rgb === undefined) {
             return "#222";
         }
         let grayscale = 0.2989 * rgb[0] + 0.5870 * rgb[1] + 0.1140 * rgb[2];
@@ -399,13 +398,14 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
             stops.push(<stop offset={colorStopToPercentageText(gradient.secondaryColorStop)} stopColor={gradient.secondaryColor} key="secondary2"/>);
         }
         stops.push(<stop offset="100%" stopColor={gradient.secondaryColor} key="secondary"/>);
-        return (<linearGradient x1={x1} x2={x2} y1={y1} y2={y2} id={gradientName} key={gradientName}>
-            {stops}
-        </linearGradient>);
+        let linearGradient = <linearGradient x1={x1} x2={x2} y1={y1} y2={y2} id={gradientName} key={gradientName}></linearGradient>;
+        // TODO - had to do it this way when upgrading to React 18 (instead of using {stops} inline in JSX)
+        linearGradient.props.children = stops;
+        return linearGradient;
     }
 
     render() {
-        if (isNullOrUndefined(this.state.drawingInfo)) {
+        if (this.state.drawingInfo === null || this.state.drawingInfo === undefined) {
             return <div>Loading...</div>;
         }
         // https://d3-geomap.github.io/map/choropleth/us-states/
@@ -471,8 +471,8 @@ export class USStateMap extends Component<USStateMapProps, USStateMapState>{
         for (let gradient of Array.from(gradients.values())) {
             gradientElements.push(this.makeSVGGradient(gradient));
         }
-        let xTranslation = xOffset + (isUndefined(this.props.x) ? 0 : this.props.x);
-        let yTranslation = yOffset + (isUndefined(this.props.y) ? 0 : this.props.y);
+        let xTranslation = xOffset + ((this.props.x === undefined) ? 0 : this.props.x);
+        let yTranslation = yOffset + ((this.props.y === undefined) ? 0 : this.props.y);
         return <svg width={this.props.width} height={this.props.height} onClick={this.rootClick}>
             <g className="usStateG" transform={`scale(${scale} ${scale}) translate(${xTranslation}, ${yTranslation})`} onClick={this.rootClick}>
                 <defs>

@@ -3,10 +3,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -55,7 +57,6 @@ var React = require("react");
 var d3 = require("d3");
 var _ = require("lodash");
 var topojson = require("topojson-client");
-var util_1 = require("util");
 // not sure why these are necessary this way?
 var polylabel = require('polylabel');
 var parseColor = require('parse-color');
@@ -83,7 +84,7 @@ var ColorGradient = /** @class */ (function () {
         }
         else {
             if (mainColorStop < 0 || mainColorStop > 1) {
-                throw "mainColorStop must be between 0-1, got " + mainColorStop;
+                throw "mainColorStop must be between 0-1, got ".concat(mainColorStop);
             }
             this.mainColorStop = mainColorStop;
         }
@@ -92,10 +93,10 @@ var ColorGradient = /** @class */ (function () {
         }
         else {
             if (secondaryColorStop < 0 || secondaryColorStop > 1) {
-                throw "secondaryColorStop must be between 0-1, got " + secondaryColorStop;
+                throw "secondaryColorStop must be between 0-1, got ".concat(secondaryColorStop);
             }
             if (secondaryColorStop < mainColorStop) {
-                throw "secondaryColorStop (" + secondaryColorStop + ") must be greater than or equal to mainColorStop (" + mainColorStop + ")";
+                throw "secondaryColorStop (".concat(secondaryColorStop, ") must be greater than or equal to mainColorStop (").concat(mainColorStop, ")");
             }
             this.secondaryColorStop = secondaryColorStop;
         }
@@ -120,38 +121,38 @@ var USStateMap = /** @class */ (function (_super) {
             // event.target is the childmost thing that got clicked on
             // (event.currentTarget is the element we registered on, which is not helpful)
             var target = event.target;
-            if (util_1.isNullOrUndefined(target)) {
+            if (target === null || target === undefined) {
                 return;
             }
             var nameAttribute = target.attributes["name"];
             // TODO - this is a little brittle, I guess, it assumes that the root SVG
             // thing doesn't have a name
-            if (util_1.isNullOrUndefined(nameAttribute)) {
+            if (nameAttribute === null || nameAttribute === undefined) {
                 if (_this.props.stateClearedCallback) {
                     _this.props.stateClearedCallback();
                 }
             }
         };
         _this.getSVGPaths = function (stateCode, stateName, path, gradients) {
-            if (util_1.isNullOrUndefined(path)) {
+            if (path === null || path === undefined) {
                 return [];
             }
             var color = (_this.props.stateColors && _this.props.stateColors.get(stateCode)) || 'rgb(240, 240, 240)';
             var titleExtra = _this.props.stateTitles && _this.props.stateTitles.get(stateCode);
             var parsedPath = _this.parsePath(path);
-            var title = util_1.isNullOrUndefined(titleExtra) ? stateName : stateName + ": " + titleExtra;
+            var title = (titleExtra === null || titleExtra === undefined) ? stateName : "".concat(stateName, ": ").concat(titleExtra);
             var textPosition;
             var parts = [];
             var primaryColor = _this.isColorGradient(color) ? color.mainColor : color;
             if (_this.isColorGradient(color)) {
                 gradients.add(color);
             }
-            var cssColor = _this.isColorGradient(color) ? "url(#" + _this.gradientNameFromColorGradient(color) + ")" : color;
+            var cssColor = _this.isColorGradient(color) ? "url(#".concat(_this.gradientNameFromColorGradient(color), ")") : color;
             // only use labelLines in non-cartogram mode - state codes fit inside all the states in cartogram mode
             if (!_this.props.isCartogram && _this.labelLines.has(stateCode)) {
                 var labelLineInfo = _this.labelLines.get(stateCode);
                 textPosition = labelLineInfo.lineTextPosition;
-                var linePath = "M " + labelLineInfo.lineStart[0] + "," + labelLineInfo.lineStart[1] + " L " + labelLineInfo.lineEnd[0] + "," + labelLineInfo.lineEnd[1] + " Z";
+                var linePath = "M ".concat(labelLineInfo.lineStart[0], ",").concat(labelLineInfo.lineStart[1], " L ").concat(labelLineInfo.lineEnd[0], ",").concat(labelLineInfo.lineEnd[1], " Z");
                 parts.push(React.createElement("path", { key: stateCode + "line", name: stateCode + "line", d: linePath, className: "labelLine" }));
             }
             else {
@@ -302,7 +303,7 @@ var USStateMap = /** @class */ (function (_super) {
         var backgroundParsedColor = parseColor(backgroundColor);
         // Used to use HSL, but I think this is more accurate
         var rgb = backgroundParsedColor.rgb;
-        if (util_1.isNullOrUndefined(rgb)) {
+        if (rgb === null || rgb === undefined) {
             return "#222";
         }
         var grayscale = 0.2989 * rgb[0] + 0.5870 * rgb[1] + 0.1140 * rgb[2];
@@ -337,7 +338,7 @@ var USStateMap = /** @class */ (function (_super) {
     };
     USStateMap.prototype.makeSVGGradient = function (gradient) {
         function colorStopToPercentageText(colorStop) {
-            return Math.round(colorStop * 100) + "%";
+            return "".concat(Math.round(colorStop * 100), "%");
         }
         var gradientName = this.gradientNameFromColorGradient(gradient);
         var x1 = 0;
@@ -367,10 +368,13 @@ var USStateMap = /** @class */ (function (_super) {
             stops.push(React.createElement("stop", { offset: colorStopToPercentageText(gradient.secondaryColorStop), stopColor: gradient.secondaryColor, key: "secondary2" }));
         }
         stops.push(React.createElement("stop", { offset: "100%", stopColor: gradient.secondaryColor, key: "secondary" }));
-        return (React.createElement("linearGradient", { x1: x1, x2: x2, y1: y1, y2: y2, id: gradientName, key: gradientName }, stops));
+        var linearGradient = React.createElement("linearGradient", { x1: x1, x2: x2, y1: y1, y2: y2, id: gradientName, key: gradientName });
+        // TODO - had to do it this way when upgrading to React 18 (instead of using {stops} inline in JSX)
+        linearGradient.props.children = stops;
+        return linearGradient;
     };
     USStateMap.prototype.render = function () {
-        if (util_1.isNullOrUndefined(this.state.drawingInfo)) {
+        if (this.state.drawingInfo === null || this.state.drawingInfo === undefined) {
             return React.createElement("div", null, "Loading...");
         }
         // https://d3-geomap.github.io/map/choropleth/us-states/
@@ -439,10 +443,10 @@ var USStateMap = /** @class */ (function (_super) {
             var gradient = _c[_b];
             gradientElements.push(this.makeSVGGradient(gradient));
         }
-        var xTranslation = xOffset + (util_1.isUndefined(this.props.x) ? 0 : this.props.x);
-        var yTranslation = yOffset + (util_1.isUndefined(this.props.y) ? 0 : this.props.y);
+        var xTranslation = xOffset + ((this.props.x === undefined) ? 0 : this.props.x);
+        var yTranslation = yOffset + ((this.props.y === undefined) ? 0 : this.props.y);
         return React.createElement("svg", { width: this.props.width, height: this.props.height, onClick: this.rootClick },
-            React.createElement("g", { className: "usStateG", transform: "scale(" + scale + " " + scale + ") translate(" + xTranslation + ", " + yTranslation + ")", onClick: this.rootClick },
+            React.createElement("g", { className: "usStateG", transform: "scale(".concat(scale, " ").concat(scale, ") translate(").concat(xTranslation, ", ").concat(yTranslation, ")"), onClick: this.rootClick },
                 React.createElement("defs", null, gradientElements),
                 paths));
     };
