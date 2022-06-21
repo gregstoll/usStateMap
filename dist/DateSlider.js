@@ -21,7 +21,6 @@ var React = require("react");
 var semantic_ui_react_1 = require("semantic-ui-react");
 var rc_slider_1 = require("rc-slider");
 require("rc-slider/assets/index.css");
-var util_1 = require("util");
 var DateSliderSpeedEnum;
 (function (DateSliderSpeedEnum) {
     DateSliderSpeedEnum[DateSliderSpeedEnum["VerySlow"] = 2500] = "VerySlow";
@@ -45,7 +44,7 @@ var TickDateRange = /** @class */ (function () {
      */
     function TickDateRange(endYear, endMonth) {
         this.endYear = endYear;
-        var realEndMonth = (0, util_1.isUndefined)(endMonth) ? 11 : endMonth;
+        var realEndMonth = endMonth === undefined ? 11 : endMonth;
         if (realEndMonth < 0 || realEndMonth > 11) {
             throw "endMonth is out of range (must be >= 0 and < 12, got ".concat(endMonth, ")");
         }
@@ -102,14 +101,14 @@ var DateSlider = /** @class */ (function (_super) {
             console.error("Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!");
             throw "Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!";
         }
-        _this.state = { isPlaying: false, playSpeed: (0, util_1.isNullOrUndefined)(props.initialSpeed) ? DateSliderSpeedEnum.Normal : props.initialSpeed };
+        _this.state = { isPlaying: false, playSpeed: (props.initialSpeed === null || props.initialSpeed === undefined) ? DateSliderSpeedEnum.Normal : props.initialSpeed };
         return _this;
     }
     /**
      * How many months the date advances per tick.
      * */
     DateSlider.prototype.monthChangePerTick = function () {
-        if ((0, util_1.isUndefined)(this.props.ticksPerYear)) {
+        if (this.props.ticksPerYear === undefined) {
             return this.props.yearsPerTick * 12;
         }
         else {
@@ -145,7 +144,7 @@ var DateSlider = /** @class */ (function (_super) {
             React.createElement(semantic_ui_react_1.Button, { onClick: function () { return _this.clickStopPlayButton(); } }, this.state.isPlaying ? "Stop" : "Play"),
             "Speed: ",
             React.createElement(semantic_ui_react_1.Select, { options: DateSlider.speedOptions(), value: this.state.playSpeed, onChange: this.changeSpeed }));
-        var sliderProps = (0, util_1.isNullOrUndefined)(this.props.cssProps) ? { width: 500 } : this.props.cssProps;
+        var sliderProps = (this.props.cssProps === null || this.props.cssProps === undefined) ? { width: 500 } : this.props.cssProps;
         // https://react-component.github.io/slider/examples/slider.html
         return (React.createElement("div", { style: sliderProps, className: "centerFixedWidth" },
             React.createElement(rc_slider_1["default"], { min: 0, max: this.dateRangeToSliderIndex(this.props.endTickDateRange), step: 1, value: this.dateRangeToSliderIndex(this.props.currentTickDateRange), onChange: this.onSliderChange }),

@@ -4,7 +4,6 @@ import { Button, Select } from 'semantic-ui-react';
 import * as _ from 'lodash';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import { isUndefined, isNullOrUndefined } from 'util';
 
 export enum DateSliderSpeedEnum {
     VerySlow = 2500,
@@ -76,7 +75,7 @@ export class TickDateRange {
      */
     constructor(endYear: number, endMonth?: number) {
         this.endYear = endYear;
-        let realEndMonth: number = isUndefined(endMonth) ? 11 : endMonth;
+        let realEndMonth: number = endMonth === undefined ? 11 : endMonth;
         if (realEndMonth < 0 || realEndMonth > 11) {
             throw `endMonth is out of range (must be >= 0 and < 12, got ${endMonth})`;
         }
@@ -99,14 +98,14 @@ export class DateSlider extends Component<DateSliderProps, DateSliderState> {
             console.error("Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!");
             throw "Exactly one of DateSlider's ticksPerYear and yearsPerTick should be defined!";
         }
-        this.state = { isPlaying: false, playSpeed: isNullOrUndefined(props.initialSpeed) ? DateSliderSpeedEnum.Normal : props.initialSpeed };
+        this.state = { isPlaying: false, playSpeed: (props.initialSpeed === null || props.initialSpeed === undefined) ? DateSliderSpeedEnum.Normal : props.initialSpeed };
     }
 
     /**
      * How many months the date advances per tick.
      * */
     monthChangePerTick() {
-        if (isUndefined(this.props.ticksPerYear)) {
+        if (this.props.ticksPerYear === undefined) {
             return this.props.yearsPerTick * 12;
         }
         else {
@@ -180,7 +179,7 @@ export class DateSlider extends Component<DateSliderProps, DateSliderState> {
                 <Button onClick={() => this.clickStopPlayButton()}>{this.state.isPlaying ? "Stop" : "Play"}</Button>
                 Speed: <Select options={DateSlider.speedOptions()} value={this.state.playSpeed} onChange={this.changeSpeed} />
             </div>;
-        let sliderProps = isNullOrUndefined(this.props.cssProps) ? {width: 500} : this.props.cssProps;
+        let sliderProps = (this.props.cssProps === null || this.props.cssProps === undefined) ? {width: 500} : this.props.cssProps;
         // https://react-component.github.io/slider/examples/slider.html
         return (
             <div style={sliderProps} className="centerFixedWidth">
